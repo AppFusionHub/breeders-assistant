@@ -4,6 +4,8 @@ import {
 } from 'lucide-react';
 import { db } from '../db';
 import { PageHeader, Tile } from '../components';
+import { useProfile } from '../profile';
+import { Store } from 'lucide-react';
 import { useDueHealth } from '../hooks';
 import { useTodayList } from '../schedule';
 import { incubationDay } from '../lib/incubation';
@@ -51,10 +53,12 @@ export function More() {
   const t = today();
   const [from, to] = periodRange({ kind: 'month', year: Number(t.slice(0, 4)), month: Number(t.slice(5, 7)) });
   const month = useLiveQuery(async () => summarize(await db.transactions.where('date').between(from, to, true, true).toArray()), [from, to]);
+  const profile = useProfile();
   return (
     <div className="stack">
       <PageHeader title="More" />
       <div className="tiles">
+        <Tile to="/profile" icon={Store} tone="red" title="Farm profile" meta={[profile?.farmName, profile?.pinHash ? 'PIN on' : 'PIN off'].filter(Boolean).join(' · ')} />
         <Tile to="/costs" icon={Wallet} tone="green" title="Costs & income" meta={`This month: ${peso(month?.expense ?? 0, true)} spent`} />
         <Tile to="/guides" icon={BookOpen} tone="blue" title="Guides" meta="Incubation, brooding, vaccines, breeding" />
         <Tile to="/settings" icon={SettingsIcon} tone="gray" title="Settings & backup" meta="Export or restore your data, notifications" />

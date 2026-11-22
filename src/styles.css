@@ -270,3 +270,31 @@ ul.tight, ol.tight { margin: 0; padding-left: 20px; } ul.tight li + li, ol.tight
 .avatar.placeholder.sex-M { background: var(--blue-soft); }
 .avatar.placeholder.sex-F { background: var(--plum-soft); }
 .avatar.placeholder.sex-U { color: var(--muted); }
+
+/* ===== Auth / profile ===== */
+.farm-logo { border-radius: 9px; object-fit: cover; flex: none; }
+.brand span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 62vw; }
+.auth-screen { min-height: 100dvh; display: grid; place-items: center; padding: calc(24px + env(safe-area-inset-top)) 16px 24px;
+  background: radial-gradient(120% 60% at 50% 0%, var(--primary-soft), var(--bg) 70%); }
+.auth-card { width: 100%; max-width: 360px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.auth-card.wide { max-width: 440px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 24px 20px; box-shadow: var(--shadow); }
+.auth-card .farm-logo, .auth-card .logo { border-radius: 20px; }
+.auth-card h1 { margin-top: 8px; }
+.pinpad { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.pin-dots { display: flex; gap: 16px; margin: 12px 0 4px; }
+.pin-dots span { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--muted); transition: background .1s; }
+.pin-dots span.on { background: var(--primary); border-color: var(--primary); }
+.pin-dots.shake { animation: shake .35s; }
+@keyframes shake { 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-4px); } }
+.pin-keys { display: grid; grid-template-columns: repeat(3, 72px); gap: 14px 22px; justify-content: center; margin: 4px 0 12px; }
+.pin-keys button { width: 72px; height: 72px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--text);
+  font: inherit; font-size: 1.6rem; font-weight: 600; display: grid; place-items: center; cursor: pointer; box-shadow: var(--shadow); }
+.pin-keys button:active { background: var(--primary-soft); }
+.recovery-code { font: 700 1.6rem/1.2 ui-monospace, Menlo, Consolas, monospace; letter-spacing: .12em; padding: 14px; border: 2px dashed var(--accent); border-radius: 14px; background: var(--accent-soft); margin: 4px 0 8px; }
+.logo-field { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
+.logo-pick { width: 76px; height: 76px; border-radius: 20px; border: 1.5px dashed var(--line); background: var(--surface-2); color: var(--muted); display: grid; place-items: center; cursor: pointer; overflow: hidden; padding: 0; flex: none; }
+.logo-pick img { width: 100%; height: 100%; object-fit: cover; }
+.profile-head { display: flex; gap: 16px; align-items: center; }
+.profile-head .farm-logo, .profile-head .logo { border-radius: 24px; }
+.profile-head h1 { overflow-wrap: anywhere; }
+.auth-card .center .logo, .auth-card.wide .center svg { margin: 0 auto; }

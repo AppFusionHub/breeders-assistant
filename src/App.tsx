@@ -1,4 +1,4 @@
-import { NavLink, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Bell, ChevronLeft } from 'lucide-react';
 import Home from './pages/Home';
 import Birds from './pages/Birds';
@@ -24,9 +24,12 @@ import { Breeding, Care, More } from './pages/Hubs';
 import { useInAppNotifications } from './notify';
 import { useTodayList } from './schedule';
 import { TABS, isRoot, tabFor } from './nav';
-import { Logo } from './components';
+import { useEffect } from 'react';
+import { useLock, useProfile } from './profile';
+import { FarmMark, LockScreen, Onboarding, Profile } from './pages/Account';
+import type { FarmProfile } from './db';
 
-function TopBar() {
+function TopBar({ profile }: { profile: FarmProfile }) {
   const { pathname } = useLocation();
   const nav = useNavigate();
   const today = useTodayList();
@@ -36,7 +39,7 @@ function TopBar() {
   return (
     <header className="topbar">
       {root ? (
-        <Link to="/" className="brand"><Logo /><span>Breeder's Assistant</span></Link>
+        <Link to="/profile" className="brand" aria-label={`${profile.farmName}, open farm profile`}><FarmMark profile={profile} /><span>{profile.farmName}</span></Link>
       ) : (
         <button className="back" onClick={() => (history.length > 1 ? nav(-1) : nav(tab.to))} aria-label="Back">
           <ChevronLeft size={22} strokeWidth={2.25} /><span>{tab.label}</span>
@@ -51,12 +54,22 @@ function TopBar() {
 }
 
 export default function App() {
+  const profile = useProfile();
+  const { unlocked } = useLock();
+  useEffect(() => { document.title = profile?.farmName || "Breeder's Assistant"; }, [profile?.farmName]);
+  if (profile === undefined) return null; // loading
+  if (!profile || !profile.setupDone) return <Onboarding />;
+  if (profile.pinHash && !unlocked) return <LockScreen profile={profile} />;
+  return <MainApp profile={profile} />;
+}
+
+function MainApp({ profile }: { profile: FarmProfile }) {
   const { pathname } = useLocation();
   useInAppNotifications();
   const active = tabFor(pathname);
   return (
     <div className="app">
-      <TopBar />
+      <TopBar profile={profile} />
       <main className="content" key={pathname}>
         <ErrorBoundary>
           <Routes>
@@ -93,6 +106,7 @@ export default function App() {
             <Route path="/guides" element={<Guides />} />
             <Route path="/guides/:slug" element={<GuideDetail />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<p className="muted">Page not found.</p>} />
           </Routes>
         </ErrorBoundary>
@@ -102,10 +116,10 @@ export default function App() {
           const Icon = t.icon;
           const on = t === active;
           return (
-            <NavLink key={t.to} to={t.to} className={on ? 'tab active' : 'tab'} aria-current={on ? 'page' : undefined}>
+            <Link key={t.to} to={t.to} className={on ? 'tab active' : 'tab'} aria-current={on ? 'page' : undefined}>
               <span className="tab-pill"><Icon size={22} strokeWidth={on ? 2.25 : 1.9} /></span>
               <span>{t.label}</span>
-            </NavLink>
+            </Link>
           );
         })}
       </nav>

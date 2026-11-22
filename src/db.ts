@@ -141,6 +141,21 @@ export interface FeedPlan {
   createdAt: number;
 }
 
+export interface FarmProfile {
+  farmName: string;
+  ownerName?: string;
+  location?: string;
+  phone?: string;
+  logo?: string; // small JPEG data URL
+  pinHash?: string; // salted SHA-256, never the PIN itself
+  pinSalt?: string;
+  recoveryHash?: string;
+  setupDone?: boolean;
+  createdAt: number;
+}
+
+export interface MetaRow { key: string; value: unknown }
+
 export const db = new Dexie('breeders-assistant') as Dexie & {
   birds: EntityTable<Bird, 'id'>;
   batches: EntityTable<Batch, 'id'>;
@@ -152,6 +167,7 @@ export const db = new Dexie('breeders-assistant') as Dexie & {
   programs: EntityTable<Program, 'id'>;
   runs: EntityTable<ProgramRun, 'id'>;
   feedPlans: EntityTable<FeedPlan, 'id'>;
+  meta: EntityTable<MetaRow, 'key'>;
 };
 
 db.version(1).stores({
@@ -185,6 +201,10 @@ db.version(3).stores({
 
 db.version(4).stores({
   feedPlans: '++id, name',
+});
+
+db.version(5).stores({
+  meta: 'key',
 });
 
 db.on('populate', (tx) => {

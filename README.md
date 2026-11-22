@@ -15,6 +15,7 @@ An offline-first Progressive Web App (PWA) for gamefowl breeders: bird records, 
 - **Programs & routines**: built-in breeding-season programs (pre-breeding conditioning, molt care, hen recovery, chick-to-stag grow-out) with sources, plus a builder for your own multi-day routines. Starting one creates all its reminders.
 - **Feeding by age**: stages from chick to adult (plus breeders and molt) with protein and calcium targets, using Philippine feeds. Includes a feed mix calculator that checks your own mix's protein against the target, and each bird's page shows its current feeding stage.
 - **Custom feeding plans**: your own stages by age (weeks) or days, each with a feed mix (built-in feeds or your own brands with label protein), grams per bird per day, feedings per day and notes. Shows the live protein % against the age reference. Starting a plan for birds or a pen creates feed-change reminders, and each bird's page shows its current stage.
+- **Farm profile & PIN lock**: first-run setup (farm name, owner, location, contact, logo). The farm name and logo replace the app name in the header. Optional 4-digit PIN lock (salted hash, auto-locks after 5 minutes in the background) with a one-time recovery code. Everything stays on the device; it is not encrypted.
 - **Guides** (offline): incubation, brooding, vaccination, biosecurity, disease signs, breeding systems and record keeping, with sources.
 - **Backup**: JSON export/import (uses the share sheet on mobile). All data stays on the device in IndexedDB.
 
