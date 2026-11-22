@@ -31,3 +31,10 @@ React 19, React Router (HashRouter), Dexie (IndexedDB), vite-plugin-pwa (Workbox
 ## Content disclaimer
 
 The guides are general information, not veterinary advice. Check vaccination schedules against current BAI guidance and your veterinarian's advice.
+
+## Deployment (GitHub Pages)
+
+`.github/workflows/deploy.yml` tests, builds and deploys `dist/` to GitHub Pages on every push to `main` (or the current dev branch), and can also be run manually from the Actions tab.
+
+One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+The site will be at `https://<owner>.github.io/breeders-assistant/`.
