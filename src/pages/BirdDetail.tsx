@@ -5,6 +5,7 @@ import { useBirds, useKinship } from '../hooks';
 import { Avatar, Card, SexBadge, Stars } from '../components';
 import { peso } from '../lib/money';
 import { stageForAge } from '../lib/feeding';
+import { stageAt, stageSummary } from '../lib/feedplan';
 import { ageLabel, daysBetween, fmt, today } from '../lib/dates';
 
 function PedNode({ bird, role }: { bird?: Bird; role: string }) {
@@ -25,6 +26,13 @@ export default function BirdDetail() {
   const kin = useKinship(map);
   const bird = map.get(id);
   const offspring = useLiveQuery(() => db.birds.filter((b) => b.sireId === id || b.damId === id).toArray(), [id]);
+  const feeding = useLiveQuery(async () => {
+    const run = (await db.runs.filter((r) => !r.stopped && r.programKey.startsWith('feed:') && r.birdIds.includes(id)).toArray())
+      .sort((a, b) => b.createdAt - a.createdAt)[0];
+    if (!run) return null;
+    const plan = await db.feedPlans.get(Number(run.programKey.slice(5)));
+    return plan ? { run, plan } : null;
+  }, [id]);
   const money = useLiveQuery(() => db.transactions.where('birdId').equals(id).toArray(), [id]);
   const health = useLiveQuery(() => db.health.where('birdId').equals(id).reverse().sortBy('date'), [id]);
 
@@ -63,7 +71,14 @@ export default function BirdDetail() {
           <dt>Bloodline</dt><dd>{bird.bloodline ?? '—'}</dd>
           <dt>Color</dt><dd>{bird.color ?? '—'}</dd>
           <dt>Hatched</dt><dd>{fmt(bird.hatchDate)} {bird.hatchDate && <span className="muted">({ageLabel(bird.hatchDate)})</span>}</dd>
-          {bird.status === 'active' && (() => {
+          {bird.status === 'active' && feeding && (() => {
+            const cur = stageAt(feeding.plan, daysBetween(feeding.run.startDate, today()));
+            return <><dt>Feeding plan</dt><dd>
+              <Link to={`/feedplans/${feeding.plan.id}`}>{feeding.plan.name}</Link>
+              {cur ? <>: <b>{cur.stage.name}</b><div className="small muted">{stageSummary(cur.stage)}</div></> : <span className="muted small"> (starts {fmt(feeding.run.startDate)})</span>}
+            </dd></>;
+          })()}
+          {bird.status === 'active' && !feeding && (() => {
             const st = stageForAge(bird.hatchDate ? daysBetween(bird.hatchDate, today()) / 7 : null, bird.sex);
             return <><dt>Feeding</dt><dd><Link to={`/feeding?stage=${st.id}`}>{st.name}</Link> <span className="muted small">({st.protein[0]}–{st.protein[1]}% protein)</span></dd></>;
           })()}

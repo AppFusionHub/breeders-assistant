@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Card } from '../components';
+import { FeedPlanList } from './FeedPlans';
 import { FEED_STAGES, INGREDIENTS, mixProtein, mixVerdict } from '../lib/feeding';
 
 type Mix = Record<string, { share: string; protein: number }>;
@@ -54,6 +55,9 @@ export default function Feeding() {
       <h1>Feeding by age</h1>
       <p className="small muted">Uses feeds you can buy in the Philippines. A complete commercial feed is the base at every stage; grains and greens are added on top. Always check the protein % printed on the sack.</p>
 
+      <FeedPlanList />
+
+      <h2 className="eyebrow">Reference guide</h2>
       <div className="chips">
         {FEED_STAGES.map((s) => (
           <button key={s.id} className={`chip ${s.id === stage.id ? 'on' : ''}`} onClick={() => setSp({ stage: s.id }, { replace: true })}>{s.name}</button>

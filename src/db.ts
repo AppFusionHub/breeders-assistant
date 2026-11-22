@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie';
 import type { Repeat } from './lib/reminders';
+import type { FeedPlanStage } from './lib/feedplan';
 
 export type Sex = 'M' | 'F' | 'U';
 export type BirdStatus = 'active' | 'sold' | 'dead' | 'culled';
@@ -131,6 +132,15 @@ export interface ProgramRun {
   createdAt: number;
 }
 
+export interface FeedPlan {
+  id: number;
+  name: string;
+  description?: string;
+  unit: 'days' | 'weeks';
+  stages: FeedPlanStage[];
+  createdAt: number;
+}
+
 export const db = new Dexie('breeders-assistant') as Dexie & {
   birds: EntityTable<Bird, 'id'>;
   batches: EntityTable<Batch, 'id'>;
@@ -141,6 +151,7 @@ export const db = new Dexie('breeders-assistant') as Dexie & {
   reminderDone: EntityTable<ReminderDone, 'id'>;
   programs: EntityTable<Program, 'id'>;
   runs: EntityTable<ProgramRun, 'id'>;
+  feedPlans: EntityTable<FeedPlan, 'id'>;
 };
 
 db.version(1).stores({
@@ -170,6 +181,10 @@ db.version(3).stores({
   reminderDone: '++id, reminderId, date, &[reminderId+date]',
   programs: '++id, name',
   runs: '++id, startDate, stopped',
+});
+
+db.version(4).stores({
+  feedPlans: '++id, name',
 });
 
 db.on('populate', (tx) => {

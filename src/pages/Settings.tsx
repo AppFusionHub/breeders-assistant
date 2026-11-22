@@ -29,7 +29,7 @@ export default function Settings() {
       protocol: await db.protocol.toArray(), health: await db.health.toArray(),
       transactions: await db.transactions.toArray(),
       reminders: await db.reminders.toArray(), reminderDone: await db.reminderDone.toArray(),
-      programs: await db.programs.toArray(), runs: await db.runs.toArray(),
+      programs: await db.programs.toArray(), runs: await db.runs.toArray(), feedPlans: await db.feedPlans.toArray(),
     };
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
     const file = new File([blob], `breeders-backup-${today()}.json`, { type: 'application/json' });
@@ -49,9 +49,9 @@ export default function Settings() {
       const data = JSON.parse(await f.text());
       if (data.app !== 'breeders-assistant' || !Array.isArray(data.birds)) throw new Error('Not a Breeder\'s Assistant backup file.');
       if (!confirm(`Replace ALL current data with this backup (${data.birds.length} birds)?`)) return;
-      await db.transaction('rw', [db.birds, db.batches, db.protocol, db.health, db.transactions, db.reminders, db.reminderDone, db.programs, db.runs], async () => {
+      await db.transaction('rw', [db.birds, db.batches, db.protocol, db.health, db.transactions, db.reminders, db.reminderDone, db.programs, db.runs, db.feedPlans], async () => {
         await Promise.all([db.birds.clear(), db.batches.clear(), db.protocol.clear(), db.health.clear(), db.transactions.clear(),
-          db.reminders.clear(), db.reminderDone.clear(), db.programs.clear(), db.runs.clear()]);
+          db.reminders.clear(), db.reminderDone.clear(), db.programs.clear(), db.runs.clear(), db.feedPlans.clear()]);
         await db.birds.bulkAdd(data.birds);
         await db.batches.bulkAdd(data.batches ?? []);
         await db.protocol.bulkAdd(data.protocol ?? []);
@@ -61,6 +61,7 @@ export default function Settings() {
         await db.reminderDone.bulkAdd(data.reminderDone ?? []);
         await db.programs.bulkAdd(data.programs ?? []);
         await db.runs.bulkAdd(data.runs ?? []);
+        await db.feedPlans.bulkAdd(data.feedPlans ?? []);
       });
       setMsg(`Restored ${data.birds.length} birds.`);
     } catch (e) {

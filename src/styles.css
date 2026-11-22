@@ -179,3 +179,6 @@ h3 { font-size: .9rem; margin: 12px 0 4px; }
 .mix-result { text-align: center; padding: 12px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); }
 .mix-result p { margin: 6px 0 0; }
 .mix-ok .coi-num { color: var(--ok); } .mix-low .coi-num { color: var(--danger); } .mix-high .coi-num { color: var(--warn); }
+.link-btn.neutral { color: var(--primary); }
+.mix-row input[list] { text-align: left; }
+.hint.ref-low { color: var(--danger); } .hint.ref-ok { color: var(--ok); } .hint.ref-high { color: var(--warn); }
