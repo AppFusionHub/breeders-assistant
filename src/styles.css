@@ -130,3 +130,30 @@ input:focus, select:focus, textarea:focus { outline: 2px solid color-mix(in srgb
 
 .guide-card { display: flex; flex-direction: column; gap: 2px; }
 .guide ul { margin: 0; padding-left: 20px; } .guide li + li { margin-top: 6px; }
+
+.top-actions { display: flex; gap: 2px; }
+.stars { display: flex; gap: 2px; }
+.stars button, .stars span { background: none; border: 0; padding: 0 2px; line-height: 1; color: var(--line); cursor: pointer; min-width: 36px; min-height: 40px; }
+.stars span { min-width: 0; min-height: 0; cursor: default; }
+.stars .on { color: var(--accent); }
+.star-inline { color: var(--accent); letter-spacing: -1px; }
+.rate-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
+
+.period { display: flex; align-items: center; gap: 8px; }
+.money { font-variant-numeric: tabular-nums; }
+.stat b.money { font-size: 1.15rem; }
+.pos { color: var(--ok); } .neg { color: var(--danger); }
+.bars { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.bar-label { display: flex; justify-content: space-between; gap: 8px; font-size: .86rem; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+.bar-track { height: 10px; }
+.bar-fill { height: 100%; min-width: 4px; background: var(--primary); border-radius: 0 4px 4px 0; }
+
+.nick-tag { display: inline-block; font-size: .78rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); white-space: nowrap; }
+.nick-strong { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
+.nick-possible { color: var(--warn); }
+.nick-neutral { color: var(--muted); }
+.nick-poor { color: var(--danger); }
+.nick-box { margin: 0 0 12px; padding: 10px; border-radius: 10px; background: var(--bg); border: 1px solid var(--line); font-size: .9rem; color: var(--text); }
+.nick-box b { color: inherit; }
+.nick-box.nick-strong b { color: var(--ok); } .nick-box.nick-poor b { color: var(--danger); }
+ul.tight { margin: 0; padding-left: 18px; } ul.tight li + li { margin-top: 4px; }

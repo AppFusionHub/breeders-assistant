@@ -17,6 +17,8 @@ export interface Bird {
   notes?: string;
   photo?: string; // small JPEG data URL
   batchId?: number;
+  /** Breeder's own quality score, 1 (poor) – 5 (excellent). Drives nick analysis. */
+  rating?: number;
   createdAt: number;
 }
 
@@ -57,11 +59,33 @@ export interface HealthEvent {
   protocolId?: number;
 }
 
+export type TxType = 'expense' | 'income';
+
+export const EXPENSE_CATEGORIES = [
+  'Feed', 'Vitamins & supplements', 'Vaccines & medicine', 'Equipment & housing', 'Labor', 'Electricity & water',
+  'Birds purchased', 'Transport', 'Other',
+] as const;
+export const INCOME_CATEGORIES = ['Bird sale', 'Eggs', 'Stud service', 'Other'] as const;
+
+export interface Transaction {
+  id: number;
+  type: TxType;
+  date: string;
+  category: string;
+  amount: number; // PHP
+  description?: string;
+  qty?: number;
+  unit?: string; // kg, sack, bottle, pc
+  birdId?: number;
+  createdAt: number;
+}
+
 export const db = new Dexie('breeders-assistant') as Dexie & {
   birds: EntityTable<Bird, 'id'>;
   batches: EntityTable<Batch, 'id'>;
   protocol: EntityTable<ProtocolItem, 'id'>;
   health: EntityTable<HealthEvent, 'id'>;
+  transactions: EntityTable<Transaction, 'id'>;
 };
 
 db.version(1).stores({
@@ -81,6 +105,10 @@ export const DEFAULT_PROTOCOL: Omit<ProtocolItem, 'id'>[] = [
   { name: 'Newcastle (ND) killed La Sota', dayFrom: 28, dayTo: 28, route: 'Intramuscular injection', source: BAI,
     notes: 'May be optional if a recombinant ND vaccine was given at day 1.' },
 ];
+
+db.version(2).stores({
+  transactions: '++id, date, type, category, birdId, createdAt',
+});
 
 db.on('populate', (tx) => {
   tx.table('protocol').bulkAdd(DEFAULT_PROTOCOL);

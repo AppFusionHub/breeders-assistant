@@ -157,6 +157,11 @@ export const GUIDES: Guide[] = [
         'Reference values: full siblings or parent × offspring = 25%, half siblings = 12.5%, first cousins = 6.25%, unrelated = 0%.',
         'The COI is only as accurate as your records. Missing parents count as unrelated, so the real value may be higher.',
       ]},
+      { heading: 'Nicks', body: [
+        'A "nick" is a mating (a specific cock × hen, or two bloodlines) whose offspring are better than you would expect from either parent\'s results with other mates.',
+        'Nicks are found by testing, not predicted. Rate offspring consistently (same standard, similar age), then compare. The Nick finder does this comparison for you.',
+        'One good chick proves little. Look for a pair whose offspring are consistently good across several hatches, then repeat that mating and keep the best offspring for the next generation.',
+      ]},
       { heading: 'Selection & culling', body: [
         'Breed only from healthy, sound birds with good structure. Write down the traits you select for (gameness, speed, cutting ability, temperament, conformation) and keep notes on each bird.',
         'Track fertility and hatch rate per pair. A sudden drop can be an early sign of too much inbreeding.',

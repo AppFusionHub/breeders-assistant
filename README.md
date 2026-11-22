@@ -9,6 +9,8 @@ An offline-first Progressive Web App (PWA) for gamefowl breeders: bird records, 
 - **Mating planner**: pick a sire and dam to see the chicks' expected COI, with hens ranked by relatedness to the chosen sire.
 - **Incubation**: 21-day timeline (candling on days 7 and 14, lockdown on day 18, hatch on day 21), fertility and hatch rates, and one-tap chick registration with parents filled in automatically.
 - **Health**: schedule based on age (defaults follow the BAI Newcastle disease program for game fowls and can be edited), a due/overdue list with bulk "given", and a treatment log.
+- **Costs**: log feed and other expenses plus income (bird sales, eggs, stud service). Shows monthly or yearly totals by category, feed kg and average ₱/kg, cost per active bird, and one tap to repeat a recent entry.
+- **Ratings & nick finder**: rate birds 1–5. The app flags pairs and bloodline crosses whose offspring beat what each parent produces with other mates. Labels are softened when there's little data.
 - **Guides** (offline): incubation, brooding, vaccination, biosecurity, disease signs, breeding systems and record keeping, with sources.
 - **Backup**: JSON export/import (uses the share sheet on mobile). All data stays on the device in IndexedDB.
 

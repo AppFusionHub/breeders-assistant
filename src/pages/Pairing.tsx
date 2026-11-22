@@ -3,6 +3,7 @@ import { useBirds, useKinship } from '../hooks';
 import { BirdPicker, Card, Field } from '../components';
 import { coiAdvice } from '../lib/pedigree';
 import { birdLabel } from '../db';
+import { confidence, pairNicks, verdict, verdictLabel } from '../lib/nick';
 
 export default function Pairing() {
   const { birds, map } = useBirds();
@@ -17,6 +18,7 @@ export default function Pairing() {
   };
   const active = (birds ?? []).filter((b) => b.status === 'active');
 
+  const nick = sire != null && dam != null ? pairNicks(birds ?? [], 1).find((r) => r.key === `${sire}|${dam}`) : undefined;
   const coi = sire != null && dam != null ? kin.offspringCOI(sire, dam) : null;
   const advice = coi != null ? coiAdvice(coi) : null;
 
@@ -45,6 +47,12 @@ export default function Pairing() {
           <p className="small muted">
             {birdLabel(map.get(sire!))} ({map.get(sire!)?.bloodline ?? 'no line'}) × {birdLabel(map.get(dam!))} ({map.get(dam!)?.bloodline ?? 'no line'})
           </p>
+          {nick && (
+            <div className={`nick-box nick-${verdict(nick)}`}>
+              <b>{nick.n >= 2 ? verdictLabel(nick) : 'Past results'}</b>: {nick.n} rated offspring avg {nick.mean.toFixed(1)}★
+              vs expected {nick.expected.toFixed(1)}★ <span className="muted">({confidence(nick)} data)</span>
+            </div>
+          )}
           <Link to={`/hatch/new?sire=${sire}&dam=${dam}`} className="btn primary">Set eggs from this pair</Link>
         </Card>
       )}
@@ -60,6 +68,11 @@ export default function Pairing() {
           ))}
         </Card>
       )}
+
+      <Link to="/nicks" className="card guide-card">
+        <b>★ Nick finder</b>
+        <span className="small muted">See which pairs and bloodline crosses produce better offspring than expected.</span>
+      </Link>
 
       <p className="small muted">COI uses the parents you've recorded. Unknown ancestors are treated as unrelated. See the guide <Link to="/guides/breeding-systems">Breeding systems & inbreeding</Link>.</p>
     </div>

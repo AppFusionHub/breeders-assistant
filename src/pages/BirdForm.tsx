@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { db, type Bird, type BirdStatus, type Sex } from '../db';
 import { useBirds } from '../hooks';
-import { BirdPicker, Card, Field } from '../components';
+import { BirdPicker, Card, Field, Stars } from '../components';
 import { resizePhoto } from '../lib/photo';
 
 type Draft = Omit<Bird, 'id' | 'createdAt'>;
@@ -111,6 +111,9 @@ export default function BirdForm() {
             <option value="dead">Dead</option>
             <option value="culled">Culled</option>
           </select>
+        </Field>
+        <Field label="Quality rating" group hint="Your own 1–5 score for this bird. Tap again to clear. Used to find nicks.">
+          <Stars value={d.rating} onChange={(v) => up('rating', v)} />
         </Field>
         <Field label="Notes">
           <textarea rows={3} value={d.notes ?? ''} onChange={(e) => up('notes', e.target.value)} placeholder="Traits, style, temperament, buyer…" />

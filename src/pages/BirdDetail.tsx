@@ -2,7 +2,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, birdLabel, type Bird } from '../db';
 import { useBirds, useKinship } from '../hooks';
-import { Avatar, Card, SexBadge } from '../components';
+import { Avatar, Card, SexBadge, Stars } from '../components';
+import { peso } from '../lib/money';
 import { ageLabel, fmt } from '../lib/dates';
 
 function PedNode({ bird, role }: { bird?: Bird; role: string }) {
@@ -23,6 +24,7 @@ export default function BirdDetail() {
   const kin = useKinship(map);
   const bird = map.get(id);
   const offspring = useLiveQuery(() => db.birds.filter((b) => b.sireId === id || b.damId === id).toArray(), [id]);
+  const money = useLiveQuery(() => db.transactions.where('birdId').equals(id).toArray(), [id]);
   const health = useLiveQuery(() => db.health.where('birdId').equals(id).reverse().sortBy('date'), [id]);
 
   if (!map.size) return null;
@@ -61,7 +63,16 @@ export default function BirdDetail() {
           <dt>Color</dt><dd>{bird.color ?? '—'}</dd>
           <dt>Hatched</dt><dd>{fmt(bird.hatchDate)} {bird.hatchDate && <span className="muted">({ageLabel(bird.hatchDate)})</span>}</dd>
           <dt>Inbreeding (COI)</dt><dd>{(coi * 100).toFixed(1)}%</dd>
+          {money?.map((m) => (
+            <span key={m.id} style={{ display: 'contents' }}>
+              <dt>{m.category}</dt><dd>{m.type === 'income' ? '+' : '−'}{peso(m.amount)} <span className="muted small">{fmt(m.date)}</span></dd>
+            </span>
+          ))}
         </dl>
+        <div className="rate-row">
+          <span className="small muted">Rating</span>
+          <Stars value={bird.rating} onChange={(v) => db.birds.update(id, { rating: v })} size={26} />
+        </div>
         {bird.notes && <p className="notes">{bird.notes}</p>}
       </Card>
 
@@ -87,7 +98,7 @@ export default function BirdDetail() {
         </div>
         {offspring?.map((o) => (
           <Link key={o.id} to={`/birds/${o.id}`} className="row-link">
-            <span>{birdLabel(o)}</span>
+            <span>{birdLabel(o)} {o.rating ? <span className="small star-inline">{'★'.repeat(o.rating)}</span> : null}</span>
             <span className="muted small">× {birdLabel(map.get((bird.sex === 'M' ? o.damId : o.sireId) ?? -1))}</span>
           </Link>
         ))}
@@ -107,6 +118,9 @@ export default function BirdDetail() {
         ))}
       </Card>
 
+      {bird.status === 'active' && (
+        <Link to={`/costs/new?type=income&bird=${id}`} className="btn ghost">Record sale of this bird</Link>
+      )}
       <button className="btn danger ghost" onClick={remove}>Delete bird</button>
     </div>
   );

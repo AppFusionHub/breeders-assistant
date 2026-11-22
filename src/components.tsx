@@ -60,6 +60,20 @@ export function BirdPicker({
   );
 }
 
+export function Stars({ value, onChange, size = 28 }: { value?: number; onChange?: (v?: number) => void; size?: number }) {
+  return (
+    <div className="stars" role={onChange ? 'radiogroup' : 'img'} aria-label={`Rating ${value ?? 0} of 5`}>
+      {[1, 2, 3, 4, 5].map((n) => {
+        const on = (value ?? 0) >= n;
+        return onChange ? (
+          <button type="button" key={n} role="radio" aria-checked={value === n} aria-label={`${n} star${n > 1 ? 's' : ''}`}
+            className={on ? 'on' : ''} style={{ fontSize: size }} onClick={() => onChange(value === n ? undefined : n)}>★</button>
+        ) : <span key={n} className={on ? 'on' : ''} style={{ fontSize: size }}>★</span>;
+      })}
+    </div>
+  );
+}
+
 export function Empty({ children }: { children: ReactNode }) {
   return <div className="empty">{children}</div>;
 }

@@ -5,6 +5,7 @@ import { Card } from '../components';
 import { useDueHealth } from '../hooks';
 import { fmt, today } from '../lib/dates';
 import { incubationDay, nextMilestone } from '../lib/incubation';
+import { peso, periodRange, summarize } from '../lib/money';
 
 export default function Home() {
   const stats = useLiveQuery(async () => {
@@ -18,6 +19,8 @@ export default function Home() {
   const open = useLiveQuery(() => db.batches.filter((b) => !b.closed).toArray(), []);
   const due = useDueHealth(7);
   const t = today();
+  const [mFrom, mTo] = periodRange({ kind: 'month', year: Number(t.slice(0, 4)), month: Number(t.slice(5, 7)) });
+  const month = useLiveQuery(async () => summarize(await db.transactions.where('date').between(mFrom, mTo, true, true).toArray()), [mFrom, mTo]);
 
   return (
     <div className="stack">
@@ -65,6 +68,21 @@ export default function Home() {
         ))}
         {(due?.length ?? 0) > 8 && <Link to="/health" className="small">See all {due!.length} →</Link>}
       </Card>
+
+      <div className="grid2">
+        <Link to="/costs" className="card guide-card">
+          <span className="small muted">Spent this month</span>
+          <b className="money">{peso(month?.expense ?? 0, true)}</b>
+        </Link>
+        <Link to="/nicks" className="card guide-card">
+          <span className="small muted">Breeding</span>
+          <b>★ Nick finder</b>
+        </Link>
+      </div>
+      <Link to="/guides" className="card guide-card">
+        <b>📖 Guides</b>
+        <span className="small muted">Incubation, brooding, vaccination, biosecurity, breeding systems</span>
+      </Link>
 
       <p className="muted small center">All data stays on this phone. Back it up often in Settings.</p>
     </div>

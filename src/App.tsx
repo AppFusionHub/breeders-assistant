@@ -10,13 +10,17 @@ import BatchDetail from './pages/BatchDetail';
 import Health from './pages/Health';
 import Guides, { GuideDetail } from './pages/Guides';
 import Settings from './pages/Settings';
+import Costs from './pages/Costs';
+import TxForm from './pages/TxForm';
+import Nicks from './pages/Nicks';
+import ErrorBoundary from './ErrorBoundary';
 
 const NAV = [
   { to: '/', label: 'Home', icon: '⌂' },
   { to: '/birds', label: 'Birds', icon: '🐓' },
   { to: '/hatch', label: 'Hatch', icon: '🥚' },
   { to: '/health', label: 'Health', icon: '✚' },
-  { to: '/guides', label: 'Guides', icon: '📖' },
+  { to: '/costs', label: 'Costs', icon: '₱' },
 ];
 
 export default function App() {
@@ -25,9 +29,13 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <Link to="/" className="brand">Breeder's Assistant</Link>
-        <Link to="/settings" className="icon-btn" aria-label="Settings">⚙</Link>
+        <div className="top-actions">
+          <Link to="/guides" className="icon-btn" aria-label="Guides">📖</Link>
+          <Link to="/settings" className="icon-btn" aria-label="Settings">⚙</Link>
+        </div>
       </header>
       <main className="content" key={pathname}>
+        <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/birds" element={<Birds />} />
@@ -43,8 +51,13 @@ export default function App() {
           <Route path="/guides" element={<Guides />} />
           <Route path="/guides/:slug" element={<GuideDetail />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/costs" element={<Costs />} />
+          <Route path="/costs/new" element={<TxForm />} />
+          <Route path="/costs/:id" element={<TxForm />} />
+          <Route path="/nicks" element={<Nicks />} />
           <Route path="*" element={<p className="muted">Page not found.</p>} />
         </Routes>
+        </ErrorBoundary>
       </main>
       <nav className="tabbar">
         {NAV.map((n) => (
