@@ -157,3 +157,11 @@ input:focus, select:focus, textarea:focus { outline: 2px solid color-mix(in srgb
 .nick-box b { color: inherit; }
 .nick-box.nick-strong b { color: var(--ok); } .nick-box.nick-poor b { color: var(--danger); }
 ul.tight { margin: 0; padding-left: 18px; } ul.tight li + li { margin-top: 4px; }
+
+.occ { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.card h2 + .occ, .card .row-between + .occ { border-top: 0; }
+.occ input[type=checkbox] { width: 26px; height: 26px; min-height: 26px; flex: none; accent-color: var(--primary); }
+.occ-body { display: flex; flex-direction: column; color: var(--text); min-width: 0; }
+.occ.done .occ-body b { text-decoration: line-through; color: var(--muted); }
+.chips.wrap { flex-wrap: wrap; overflow: visible; }
+.cal-card { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }

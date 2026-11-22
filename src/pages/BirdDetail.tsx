@@ -119,6 +119,9 @@ export default function BirdDetail() {
       </Card>
 
       {bird.status === 'active' && (
+        <Link to={`/reminders/new?bird=${id}`} className="btn ghost">🔔 Add reminder for this bird</Link>
+      )}
+      {bird.status === 'active' && (
         <Link to={`/costs/new?type=income&bird=${id}`} className="btn ghost">Record sale of this bird</Link>
       )}
       <button className="btn danger ghost" onClick={remove}>Delete bird</button>

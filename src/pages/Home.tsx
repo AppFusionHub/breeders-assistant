@@ -6,6 +6,9 @@ import { useDueHealth } from '../hooks';
 import { fmt, today } from '../lib/dates';
 import { incubationDay, nextMilestone } from '../lib/incubation';
 import { peso, periodRange, summarize } from '../lib/money';
+import { useBirds } from '../hooks';
+import { useTodayList } from '../schedule';
+import { OccurrenceRow } from './Reminders';
 
 export default function Home() {
   const stats = useLiveQuery(async () => {
@@ -18,6 +21,8 @@ export default function Home() {
   }, []);
   const open = useLiveQuery(() => db.batches.filter((b) => !b.closed).toArray(), []);
   const due = useDueHealth(7);
+  const todayList = useTodayList();
+  const { map } = useBirds();
   const t = today();
   const [mFrom, mTo] = periodRange({ kind: 'month', year: Number(t.slice(0, 4)), month: Number(t.slice(5, 7)) });
   const month = useLiveQuery(async () => summarize(await db.transactions.where('date').between(mFrom, mTo, true, true).toArray()), [mFrom, mTo]);
@@ -35,6 +40,17 @@ export default function Home() {
         <Link to="/pair" className="btn">Plan a mating</Link>
         <Link to="/hatch/new" className="btn">Set eggs</Link>
       </div>
+
+      <Card>
+        <div className="row-between">
+          <h2>Today's tasks</h2>
+          <Link to="/reminders" className="small">All →</Link>
+        </div>
+        {todayList && !todayList.length && (
+          <p className="muted small">Nothing today. <Link to="/reminders/new">Add a reminder</Link> or <Link to="/programs">start a program</Link>.</p>
+        )}
+        {todayList?.map((o) => <OccurrenceRow key={`${o.reminder.id}-${o.date}`} o={o} map={map} />)}
+      </Card>
 
       <Card>
         <h2>Incubating now</h2>

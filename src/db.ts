@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
+import type { Repeat } from './lib/reminders';
 
 export type Sex = 'M' | 'F' | 'U';
 export type BirdStatus = 'active' | 'sold' | 'dead' | 'culled';
@@ -80,12 +81,66 @@ export interface Transaction {
   createdAt: number;
 }
 
+export interface Reminder {
+  id: number;
+  title: string;
+  notes?: string;
+  date: string;
+  time: string;
+  repeat: Repeat;
+  endDate?: string;
+  birdIds: number[];
+  group?: string; // free-text group, e.g. "Breeding pen 1"
+  runId?: number;
+  active: boolean;
+  createdAt: number;
+}
+
+export interface ReminderDone {
+  id: number;
+  reminderId: number;
+  date: string; // occurrence date
+  doneAt: number;
+}
+
+export interface ProgramStep {
+  day: number; // offset from program start (0 = start day)
+  lastDay?: number; // repeat until this offset
+  everyDays?: number; // repeat interval when lastDay set (default 1)
+  time: string;
+  title: string;
+  notes?: string;
+}
+
+export interface Program {
+  id: number;
+  name: string;
+  description?: string;
+  steps: ProgramStep[];
+  createdAt: number;
+}
+
+export interface ProgramRun {
+  id: number;
+  programKey: string; // 'builtin:<slug>' or 'custom:<id>'
+  name: string;
+  startDate: string;
+  birdIds: number[];
+  group?: string;
+  stopped?: boolean;
+  createdAt: number;
+}
+
 export const db = new Dexie('breeders-assistant') as Dexie & {
   birds: EntityTable<Bird, 'id'>;
   batches: EntityTable<Batch, 'id'>;
   protocol: EntityTable<ProtocolItem, 'id'>;
   health: EntityTable<HealthEvent, 'id'>;
   transactions: EntityTable<Transaction, 'id'>;
+  reminders: EntityTable<Reminder, 'id'>;
+  reminderDone: EntityTable<ReminderDone, 'id'>;
+  programs: EntityTable<Program, 'id'>;
+  runs: EntityTable<ProgramRun, 'id'>;
 };
 
 db.version(1).stores({
@@ -108,6 +163,13 @@ export const DEFAULT_PROTOCOL: Omit<ProtocolItem, 'id'>[] = [
 
 db.version(2).stores({
   transactions: '++id, date, type, category, birdId, createdAt',
+});
+
+db.version(3).stores({
+  reminders: '++id, date, runId, active, *birdIds',
+  reminderDone: '++id, reminderId, date, &[reminderId+date]',
+  programs: '++id, name',
+  runs: '++id, startDate, stopped',
 });
 
 db.on('populate', (tx) => {

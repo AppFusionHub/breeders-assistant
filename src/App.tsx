@@ -14,6 +14,10 @@ import Costs from './pages/Costs';
 import TxForm from './pages/TxForm';
 import Nicks from './pages/Nicks';
 import ErrorBoundary from './ErrorBoundary';
+import Reminders from './pages/Reminders';
+import ReminderForm from './pages/ReminderForm';
+import Programs, { ProgramDetail, ProgramEditor, RunDetail } from './pages/Programs';
+import { useInAppNotifications } from './notify';
 
 const NAV = [
   { to: '/', label: 'Home', icon: '⌂' },
@@ -25,11 +29,13 @@ const NAV = [
 
 export default function App() {
   const { pathname } = useLocation();
+  useInAppNotifications();
   return (
     <div className="app">
       <header className="topbar">
         <Link to="/" className="brand">Breeder's Assistant</Link>
         <div className="top-actions">
+          <Link to="/reminders" className="icon-btn" aria-label="Reminders">🔔</Link>
           <Link to="/guides" className="icon-btn" aria-label="Guides">📖</Link>
           <Link to="/settings" className="icon-btn" aria-label="Settings">⚙</Link>
         </div>
@@ -55,6 +61,14 @@ export default function App() {
           <Route path="/costs/new" element={<TxForm />} />
           <Route path="/costs/:id" element={<TxForm />} />
           <Route path="/nicks" element={<Nicks />} />
+          <Route path="/reminders" element={<Reminders />} />
+          <Route path="/reminders/new" element={<ReminderForm />} />
+          <Route path="/reminders/:id" element={<ReminderForm />} />
+          <Route path="/programs" element={<Programs />} />
+          <Route path="/programs/new" element={<ProgramEditor />} />
+          <Route path="/programs/:key" element={<ProgramDetail />} />
+          <Route path="/programs/:key/edit" element={<ProgramEditor />} />
+          <Route path="/runs/:id" element={<RunDetail />} />
           <Route path="*" element={<p className="muted">Page not found.</p>} />
         </Routes>
         </ErrorBoundary>

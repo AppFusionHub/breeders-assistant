@@ -74,6 +74,26 @@ export function Stars({ value, onChange, size = 28 }: { value?: number; onChange
   );
 }
 
+/** Select several birds; shows chosen ones as removable chips. */
+export function BirdMultiPicker({ birds, value, onChange }: { birds: Bird[]; value: number[]; onChange: (ids: number[]) => void }) {
+  const byId = new Map(birds.map((b) => [b.id, b]));
+  return (
+    <div className="stack-sm">
+      {value.length > 0 && (
+        <div className="chips wrap">
+          {value.map((id) => (
+            <button type="button" key={id} className="chip on" onClick={() => onChange(value.filter((x) => x !== id))} aria-label={`Remove ${birdLabel(byId.get(id))}`}>
+              {byId.get(id)?.band ?? '?'} ✕
+            </button>
+          ))}
+        </div>
+      )}
+      <BirdPicker birds={birds.filter((b) => !value.includes(b.id) && b.status === 'active')} onChange={(id) => id != null && onChange([...value, id])}
+        placeholder={value.length ? '+ Add another bird' : '+ Add bird (optional)'} />
+    </div>
+  );
+}
+
 export function Empty({ children }: { children: ReactNode }) {
   return <div className="empty">{children}</div>;
 }

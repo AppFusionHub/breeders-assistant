@@ -11,6 +11,8 @@ An offline-first Progressive Web App (PWA) for gamefowl breeders: bird records, 
 - **Health**: schedule based on age (defaults follow the BAI Newcastle disease program for game fowls and can be edited), a due/overdue list with bulk "given", and a treatment log.
 - **Costs**: log feed and other expenses plus income (bird sales, eggs, stud service). Shows monthly or yearly totals by category, feed kg and average ₱/kg, cost per active bird, and one tap to repeat a recent entry.
 - **Ratings & nick finder**: rate birds 1–5. The app flags pairs and bloodline crosses whose offspring beat what each parent produces with other mates. Labels are softened when there's little data.
+- **Reminders**: one-time or repeating reminders for a bird, several birds or a pen, plus a "Today" checklist on Home. For real alarms, export to the phone calendar (.ics with alarms, or a Google Calendar link). In-app notifications show while the app is open.
+- **Programs & routines**: built-in breeding-season programs (pre-breeding conditioning, molt care, hen recovery, chick-to-stag grow-out) with sources, plus a builder for your own multi-day routines. Starting one creates all its reminders.
 - **Guides** (offline): incubation, brooding, vaccination, biosecurity, disease signs, breeding systems and record keeping, with sources.
 - **Backup**: JSON export/import (uses the share sheet on mobile). All data stays on the device in IndexedDB.
 
