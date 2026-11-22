@@ -10,6 +10,7 @@ import { BUILTIN_PROGRAMS, builtinByKey } from '../programs';
 import { downloadICS, startRun, stopRun } from '../schedule';
 import { googleCalendarUrl, occurrenceCount, repeatLabel } from '../lib/reminders';
 import { whoLabel } from './Reminders';
+import { KINDS, kindLabel } from '../lib/health';
 
 function stepWhen(s: ProgramStep): string {
   const d = (n: number) => `Day ${n + 1}`;
@@ -27,7 +28,7 @@ export function StepList({ steps, start }: { steps: ProgramStep[]; start?: strin
       {sorted.map((s, i) => (
         <li key={i}>
           <div className="tl-head"><b>{s.title}</b><span className="small muted">{start ? fmt(addDays(start, s.day)) : ''}</span></div>
-          <div className="small muted">{stepWhen(s)} · {s.time}</div>
+          <div className="small muted">{stepWhen(s)} · {s.time}{s.logAs && <> · <span className={`kind-tag kind-${s.logAs}`}>records {kindLabel(s.logAs).toLowerCase()}</span></>}</div>
           {s.notes && <div className="small">{s.notes}</div>}
         </li>
       ))}
@@ -119,8 +120,8 @@ export function ProgramDetail() {
   );
 }
 
-type StepDraft = { day: string; lastDay: string; everyDays: string; time: string; title: string; notes: string };
-const blankStep: StepDraft = { day: '1', lastDay: '', everyDays: '1', time: '07:00', title: '', notes: '' };
+type StepDraft = { day: string; lastDay: string; everyDays: string; time: string; title: string; notes: string; logAs: string };
+const blankStep: StepDraft = { day: '1', lastDay: '', everyDays: '1', time: '07:00', title: '', notes: '', logAs: '' };
 
 export function ProgramEditor() {
   const { key } = useParams();
@@ -137,7 +138,7 @@ export function ProgramEditor() {
   const ds = desc ?? existing?.description ?? '';
   const st = steps ?? (existing?.steps.map((s) => ({
     day: String(s.day + 1), lastDay: s.lastDay != null ? String(s.lastDay + 1) : '', everyDays: String(s.everyDays ?? 1),
-    time: s.time, title: s.title, notes: s.notes ?? '',
+    time: s.time, title: s.title, notes: s.notes ?? '', logAs: s.logAs ?? '',
   })) ?? [{ ...blankStep }]);
   const setStep = (i: number, patch: Partial<StepDraft>) => setSteps(st.map((s, j) => (j === i ? { ...s, ...patch } : s)));
 
@@ -152,7 +153,7 @@ export function ProgramEditor() {
       const last = s.lastDay ? Math.max(1, Number(s.lastDay)) - 1 : undefined;
       if (last != null && last < day) return setErr(`"${s.title}": end day is before start day.`);
       out.push({ day, lastDay: last != null && last > day ? last : undefined, everyDays: last != null && last > day ? Math.max(1, Number(s.everyDays) || 1) : undefined,
-        time: s.time || '07:00', title: s.title.trim(), notes: s.notes.trim() || undefined });
+        time: s.time || '07:00', title: s.title.trim(), notes: s.notes.trim() || undefined, logAs: (s.logAs || undefined) as ProgramStep['logAs'] });
     }
     const rec = { name: n.trim(), description: ds.trim() || undefined, steps: out };
     if (id) { await db.programs.update(id, rec); nav(`/programs/custom:${id}`, { replace: true }); }
@@ -187,6 +188,12 @@ export function ProgramEditor() {
             {s.lastDay && <Field label="Every N days"><input type="number" inputMode="numeric" min={1} value={s.everyDays} onChange={(e) => setStep(i, { everyDays: e.target.value })} /></Field>}
           </div>
           <Field label="Notes"><input value={s.notes} onChange={(e) => setStep(i, { notes: e.target.value })} /></Field>
+          <Field label="Record in each bird's health log as">
+            <select value={s.logAs} onChange={(e) => setStep(i, { logAs: e.target.value })}>
+              <option value="">Don't record</option>
+              {KINDS.map((k) => <option key={k.id} value={k.id}>{k.label}</option>)}
+            </select>
+          </Field>
         </Card>
       ))}
       <button type="button" className="btn" onClick={() => { const last = st[st.length - 1]; setSteps([...st, { ...blankStep, day: last?.day ?? '1', time: last?.time ?? '07:00' }]); }}>+ Add step</button>

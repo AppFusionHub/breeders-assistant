@@ -112,6 +112,9 @@ export default function BatchDetail() {
               <p className="hint">Chicks get this pair as parents, hatch date = day 21, and enter the vaccination schedule.</p>
             </>
           )}
+          {!!chicks?.length && (
+            <Link to={`/health?batch=${id}`} className="btn" style={{ width: '100%', margin: '6px 0' }}>Record vitamins / medicine for all {chicks.length} chicks</Link>
+          )}
           {chicks?.map((c) => (
             <Link key={c.id} to={`/birds/${c.id}`} className="row-link"><span>{c.band}</span><span className="small muted">{c.sex === 'U' ? 'unsexed' : c.sex}</span></Link>
           ))}

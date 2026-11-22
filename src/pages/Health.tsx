@@ -1,16 +1,17 @@
-import { useState, type FormEvent } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useEffect, useState, type FormEvent } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, birdLabel, DEFAULT_PROTOCOL, type HealthKind, type ProtocolItem } from '../db';
+import { db, birdLabel, DEFAULT_PROTOCOL, type HealthEvent, type HealthKind, type ProtocolItem } from '../db';
 import { useBirds, useDueHealth } from '../hooks';
-import { BirdPicker, Card, Empty, Field } from '../components';
-import { fmt, today } from '../lib/dates';
+import { BirdMultiPicker, Card, Empty, Field } from '../components';
+import { ageLabel, fmt, today } from '../lib/dates';
+import { KINDS, kindLabel } from '../lib/health';
 
 type Tab = 'due' | 'log' | 'schedule';
 
 export default function Health() {
   const [sp, setSp] = useSearchParams();
-  const tab = (sp.get('tab') ?? (sp.get('bird') ? 'log' : 'due')) as Tab;
+  const tab = (sp.get('tab') ?? (sp.get('bird') || sp.get('batch') ? 'log' : 'due')) as Tab;
   const setTab = (t: Tab) => setSp({ tab: t }, { replace: true });
   return (
     <div className="stack">
@@ -21,7 +22,7 @@ export default function Health() {
         <button className={tab === 'schedule' ? 'on' : ''} onClick={() => setTab('schedule')}>Schedule</button>
       </div>
       {tab === 'due' && <Due />}
-      {tab === 'log' && <Log initialBird={sp.get('bird') ? Number(sp.get('bird')) : undefined} />}
+      {tab === 'log' && <Log initialBird={sp.get('bird') ? Number(sp.get('bird')) : undefined} initialBatch={sp.get('batch') ? Number(sp.get('batch')) : undefined} />}
       {tab === 'schedule' && <Schedule />}
     </div>
   );
@@ -71,61 +72,138 @@ function Due() {
   );
 }
 
-function Log({ initialBird }: { initialBird?: number }) {
+function Log({ initialBird, initialBatch }: { initialBird?: number; initialBatch?: number }) {
   const { birds, map } = useBirds();
   const events = useLiveQuery(() => db.health.orderBy('date').reverse().limit(100).toArray(), []);
-  const [birdId, setBirdId] = useState<number | undefined>(initialBird);
+  const batches = useLiveQuery(async () => {
+    const all = await db.batches.orderBy('setDate').reverse().toArray();
+    const counts = await Promise.all(all.map((b) => db.birds.where('batchId').equals(b.id).filter((x) => x.status === 'active').count()));
+    return all.map((b, i) => ({ ...b, chicks: counts[i] })).filter((b) => b.chicks > 0);
+  }, []);
+  const [birdIds, setBirdIds] = useState<number[]>(initialBird ? [initialBird] : []);
   const [date, setDate] = useState(today());
-  const [kind, setKind] = useState<HealthKind>('treatment');
+  const [kind, setKind] = useState<HealthKind>('vitamins');
   const [product, setProduct] = useState('');
+  const [dose, setDose] = useState('');
+  const [route, setRoute] = useState('');
   const [notes, setNotes] = useState('');
+  const [msg, setMsg] = useState('');
+  const active = (birds ?? []).filter((b) => b.status === 'active');
+
+  useEffect(() => {
+    if (!initialBatch || !birds) return;
+    setBirdIds(birds.filter((b) => b.batchId === initialBatch && b.status === 'active').map((b) => b.id));
+  }, [initialBatch, birds]);
+
+  const addIds = (ids: number[]) => setBirdIds((cur) => [...new Set([...cur, ...ids])]);
 
   async function add(e: FormEvent) {
     e.preventDefault();
-    if (!birdId || !product.trim()) return;
-    await db.health.add({ birdId, date, kind, product: product.trim(), notes: notes.trim() || undefined } as never);
-    setProduct(''); setNotes('');
+    if (!birdIds.length || !product.trim()) return;
+    const rec = { date, kind, product: product.trim(), dose: dose.trim() || undefined, route: route.trim() || undefined, notes: notes.trim() || undefined };
+    await db.health.bulkAdd(birdIds.map((birdId) => ({ ...rec, birdId })) as never);
+    setMsg(`Saved to ${birdIds.length} bird${birdIds.length > 1 ? 's' : ''}.`);
+    setProduct(''); setDose(''); setNotes('');
   }
 
   return (
     <>
       <form onSubmit={add}>
         <Card>
-          <Field label="Bird"><BirdPicker birds={(birds ?? []).filter((b) => b.status === 'active')} value={birdId} onChange={setBirdId} /></Field>
+          <Field label="Birds" group>
+            <BirdMultiPicker birds={active} value={birdIds} onChange={setBirdIds} />
+          </Field>
+          <div className="chips wrap" style={{ marginTop: -6, marginBottom: 12 }}>
+            {batches?.slice(0, 4).map((b) => (
+              <button type="button" key={b.id} className="chip" onClick={() => addIds((birds ?? []).filter((x) => x.batchId === b.id && x.status === 'active').map((x) => x.id))}>
+                + Chicks: {b.label.split(' · ')[0]} ({b.chicks})
+              </button>
+            ))}
+            {active.length > 0 && <button type="button" className="chip" onClick={() => addIds(active.map((b) => b.id))}>+ All active ({active.length})</button>}
+            {birdIds.length > 1 && <button type="button" className="chip" onClick={() => setBirdIds([])}>Clear</button>}
+          </div>
+          <Field label="Type" group>
+            <div className="chips wrap">
+              {KINDS.map((k) => <button type="button" key={k.id} className={`chip ${kind === k.id ? 'on' : ''}`} onClick={() => setKind(k.id)}>{k.label}</button>)}
+            </div>
+          </Field>
+          <Field label="Product / what was given"><input value={product} onChange={(e) => setProduct(e.target.value)} placeholder="e.g. brand name of vitamins, dewormer or antibiotic" /></Field>
           <div className="grid2">
-            <Field label="Date"><input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></Field>
-            <Field label="Type">
-              <select value={kind} onChange={(e) => setKind(e.target.value as HealthKind)}>
-                <option value="vaccine">Vaccine</option>
-                <option value="deworm">Deworming</option>
-                <option value="treatment">Treatment</option>
-                <option value="vitamins">Vitamins</option>
-                <option value="other">Other</option>
-              </select>
+            <Field label="Dose"><input value={dose} onChange={(e) => setDose(e.target.value)} placeholder="e.g. 1 ml, 1 tab/L" /></Field>
+            <Field label="Route">
+              <input list="routes" value={route} onChange={(e) => setRoute(e.target.value)} placeholder="Water, oral…" />
+              <datalist id="routes">{['Drinking water', 'Oral (direct)', 'Eye drop', 'Nose drop', 'Injection (IM)', 'Injection (SC)', 'Wing web', 'In feed', 'Topical / spray'].map((r) => <option key={r} value={r} />)}</datalist>
             </Field>
           </div>
-          <Field label="Product / what was done"><input value={product} onChange={(e) => setProduct(e.target.value)} placeholder="e.g. dewormer brand, antibiotic, dose" /></Field>
-          <Field label="Notes"><input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Symptoms, dose, vet advice" /></Field>
-          <button className="btn primary" disabled={!birdId || !product.trim()}>Add record</button>
+          <div className="grid2">
+            <Field label="Date"><input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></Field>
+            <Field label="Notes"><input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Reason, vet advice" /></Field>
+          </div>
+          <button className="btn primary" disabled={!birdIds.length || !product.trim()}>
+            Save to {birdIds.length || 0} bird{birdIds.length === 1 ? '' : 's'}
+          </button>
+          {msg && <p className="small pos" role="status">{msg}</p>}
         </Card>
       </form>
       <Card>
         <h2>Recent records</h2>
         {!events?.length && <p className="muted small">No records yet.</p>}
         {events?.map((h) => (
-          <div key={h.id} className="row-link">
-            <div>
-              <b>{h.product}</b> <span className="muted small">{h.kind}</span>
-              <div className="small"><Link to={`/birds/${h.birdId}`}>{birdLabel(map.get(h.birdId))}</Link>{h.notes && ` · ${h.notes}`}</div>
+          <Link key={h.id} to={`/health/record/${h.id}`} className="row-link">
+            <div className="grow">
+              <b>{h.product}</b> <span className={`kind-tag kind-${h.kind}`}>{kindLabel(h.kind)}</span>
+              <div className="small muted">{birdLabel(map.get(h.birdId))}{h.dose && ` · ${h.dose}`}{h.route && ` · ${h.route}`}</div>
             </div>
-            <div className="right">
-              <div className="small">{fmt(h.date)}</div>
-              <button className="link-btn small" onClick={() => confirm('Delete record?') && db.health.delete(h.id)}>Delete</button>
-            </div>
-          </div>
+            <span className="small">{fmt(h.date)}</span>
+          </Link>
         ))}
       </Card>
     </>
+  );
+}
+
+export function HealthRecord() {
+  const id = Number(useParams().id);
+  const nav = useNavigate();
+  const rec = useLiveQuery(() => db.health.get(id), [id]);
+  const bird = useLiveQuery(async () => (rec ? db.birds.get(rec.birdId) : undefined), [rec?.birdId]);
+  const [d, setD] = useState<HealthEvent | null>(null);
+  useEffect(() => { if (rec) setD(rec); }, [rec]);
+  if (rec === undefined || !d) return null;
+  const up = (patch: Partial<HealthEvent>) => setD({ ...d, ...patch });
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    if (!d!.product.trim()) return;
+    await db.health.put({ ...d!, product: d!.product.trim(), dose: d!.dose?.trim() || undefined, route: d!.route?.trim() || undefined, notes: d!.notes?.trim() || undefined });
+    nav(-1);
+  }
+  async function remove() {
+    if (!confirm('Delete this health record?')) return;
+    await db.health.delete(id);
+    nav(-1);
+  }
+  return (
+    <form className="stack" onSubmit={save}>
+      <h1>Health record</h1>
+      {bird && <p className="muted">For <Link to={`/birds/${bird.id}`}>{birdLabel(bird)}</Link>{bird.hatchDate && ` · age then: ${ageLabel(bird.hatchDate, d.date)}`}</p>}
+      <Card>
+        <Field label="Type" group>
+          <div className="chips wrap">{KINDS.map((k) => <button type="button" key={k.id} className={`chip ${d.kind === k.id ? 'on' : ''}`} onClick={() => up({ kind: k.id })}>{k.label}</button>)}</div>
+        </Field>
+        <Field label="Product / what was given"><input value={d.product} onChange={(e) => up({ product: e.target.value })} /></Field>
+        <div className="grid2">
+          <Field label="Dose"><input value={d.dose ?? ''} onChange={(e) => up({ dose: e.target.value })} /></Field>
+          <Field label="Route"><input value={d.route ?? ''} onChange={(e) => up({ route: e.target.value })} /></Field>
+        </div>
+        <Field label="Date"><input type="date" value={d.date} onChange={(e) => up({ date: e.target.value })} /></Field>
+        <Field label="Notes"><textarea rows={2} value={d.notes ?? ''} onChange={(e) => up({ notes: e.target.value })} /></Field>
+      </Card>
+      <div className="actions sticky">
+        <button type="button" className="btn danger ghost" onClick={remove}>Delete</button>
+        <button type="button" className="btn ghost" onClick={() => nav(-1)}>Cancel</button>
+        <button className="btn primary">Save</button>
+      </div>
+    </form>
   );
 }
 

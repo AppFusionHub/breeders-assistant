@@ -1,4 +1,5 @@
 import { BellPlus } from 'lucide-react';
+import { HealthHistory } from './HealthHistory';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, birdLabel, type Bird } from '../db';
@@ -35,7 +36,6 @@ export default function BirdDetail() {
     return plan ? { run, plan } : null;
   }, [id]);
   const money = useLiveQuery(() => db.transactions.where('birdId').equals(id).toArray(), [id]);
-  const health = useLiveQuery(() => db.health.where('birdId').equals(id).reverse().sortBy('date'), [id]);
 
   if (!map.size) return null;
   if (!bird) return <p className="muted">Bird not found.</p>;
@@ -67,6 +67,14 @@ export default function BirdDetail() {
         <Link to={`/birds/${id}/edit`} className="btn">Edit</Link>
       </div>
 
+      {bird.sex === 'U' && bird.status === 'active' && (
+        <div className="sex-quick">
+          <span className="small muted">Sex now known?</span>
+          <button className="btn small" onClick={() => db.birds.update(id, { sex: 'M' })}>♂ It's a stag</button>
+          <button className="btn small" onClick={() => db.birds.update(id, { sex: 'F' })}>♀ It's a pullet</button>
+        </div>
+      )}
+
       <Card>
         <dl className="facts">
           <dt>Bloodline</dt><dd>{bird.bloodline ?? '—'}</dd>
@@ -97,6 +105,8 @@ export default function BirdDetail() {
         {bird.notes && <p className="notes">{bird.notes}</p>}
       </Card>
 
+      <HealthHistory bird={bird} />
+
       <Card>
         <h2>Pedigree</h2>
         <div className="ped">
@@ -125,19 +135,6 @@ export default function BirdDetail() {
         ))}
       </Card>
 
-      <Card>
-        <div className="row-between">
-          <h2>Health log</h2>
-          <Link className="small" to={`/health?bird=${id}`}>+ Log</Link>
-        </div>
-        {!health?.length && <p className="muted small">No records.</p>}
-        {health?.map((h) => (
-          <div key={h.id} className="row-link">
-            <span><b>{h.product}</b> <span className="muted small">{h.kind}</span></span>
-            <span className="small">{fmt(h.date)}</span>
-          </div>
-        ))}
-      </Card>
 
       {bird.status === 'active' && (
         <Link to={`/reminders/new?bird=${id}`} className="btn ghost"><BellPlus size={18} /> Add reminder for this bird</Link>

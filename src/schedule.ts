@@ -2,12 +2,13 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type ProgramStep, type Reminder } from './db';
 import { addDays, today } from './lib/dates';
 import { occursOn, toICS } from './lib/reminders';
+import { recordsFromReminder } from './lib/health';
 
 export function stepToReminder(step: ProgramStep, start: string) {
   const date = addDays(start, step.day);
   const repeating = step.lastDay != null && step.lastDay > step.day;
   return {
-    title: step.title, notes: step.notes, date, time: step.time,
+    title: step.title, notes: step.notes, date, time: step.time, logAs: step.logAs,
     repeat: repeating ? { kind: 'every' as const, days: Math.max(1, step.everyDays ?? 1) } : { kind: 'once' as const },
     endDate: repeating ? addDays(start, step.lastDay!) : undefined,
   };
@@ -58,13 +59,20 @@ export function useTodayList() {
   return occ?.filter((o) => o.date === t || !o.done);
 }
 
+/** Tick/untick an occurrence. If the reminder records to the health log, add/remove one record per bird. */
 export async function toggleDone(reminderId: number, date: string, done: boolean) {
-  if (done) {
-    const exists = await db.reminderDone.where('[reminderId+date]').equals([reminderId, date]).first();
-    if (!exists) await db.reminderDone.add({ reminderId, date, doneAt: Date.now() } as never);
-  } else {
-    await db.reminderDone.where('[reminderId+date]').equals([reminderId, date]).delete();
-  }
+  await db.transaction('rw', db.reminderDone, db.health, db.reminders, async () => {
+    if (done) {
+      const exists = await db.reminderDone.where('[reminderId+date]').equals([reminderId, date]).first();
+      if (exists) return;
+      await db.reminderDone.add({ reminderId, date, doneAt: Date.now() } as never);
+      const r = await db.reminders.get(reminderId);
+      if (r) await db.health.bulkAdd(recordsFromReminder(r, date) as never);
+    } else {
+      await db.reminderDone.where('[reminderId+date]').equals([reminderId, date]).delete();
+      await db.health.where('reminderId').equals(reminderId).filter((h) => h.occDate === date).delete();
+    }
+  });
 }
 
 export function downloadICS(items: Reminder[], filename: string) {

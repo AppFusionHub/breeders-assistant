@@ -57,8 +57,13 @@ export interface HealthEvent {
   date: string;
   kind: HealthKind;
   product: string;
+  dose?: string;
+  route?: string;
   notes?: string;
   protocolId?: number;
+  /** Set when the record was created by ticking off a reminder/program step. */
+  reminderId?: number;
+  occDate?: string;
 }
 
 export type TxType = 'expense' | 'income';
@@ -93,6 +98,8 @@ export interface Reminder {
   birdIds: number[];
   group?: string; // free-text group, e.g. "Breeding pen 1"
   runId?: number;
+  /** When ticked done, record this in each attached bird's health log. */
+  logAs?: HealthKind;
   active: boolean;
   createdAt: number;
 }
@@ -111,6 +118,7 @@ export interface ProgramStep {
   time: string;
   title: string;
   notes?: string;
+  logAs?: HealthKind;
 }
 
 export interface Program {
@@ -205,6 +213,10 @@ db.version(4).stores({
 
 db.version(5).stores({
   meta: 'key',
+});
+
+db.version(6).stores({
+  health: '++id, birdId, date, protocolId, reminderId',
 });
 
 db.on('populate', (tx) => {

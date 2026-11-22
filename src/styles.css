@@ -298,3 +298,19 @@ ul.tight, ol.tight { margin: 0; padding-left: 20px; } ul.tight li + li, ol.tight
 .profile-head .farm-logo, .profile-head .logo { border-radius: 24px; }
 .profile-head h1 { overflow-wrap: anywhere; }
 .auth-card .center .logo, .auth-card.wide .center svg { margin: 0 auto; }
+
+/* ===== Health history ===== */
+.kind-tag { display: inline-block; font-size: .7rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; vertical-align: 1px; background: var(--surface-2); color: var(--muted); }
+.kind-tag.kind-vaccine { background: var(--blue-soft); color: var(--blue); }
+.kind-tag.kind-deworm { background: var(--plum-soft); color: var(--plum); }
+.kind-tag.kind-vitamins { background: var(--accent-soft); color: var(--warn); }
+.kind-tag.kind-treatment { background: var(--danger-soft); color: var(--danger); }
+.due-box { background: var(--blue-soft); border-radius: var(--radius-sm); padding: 10px 12px; margin: 4px 0 8px; display: flex; flex-direction: column; gap: 6px; }
+.due-row { display: flex; align-items: center; gap: 10px; }
+.hist { list-style: none; margin: 6px 0 0; padding: 0; position: relative; }
+.hist::before { content: ''; position: absolute; left: 5px; top: 12px; bottom: 12px; width: 2px; background: var(--line); }
+.hist-row { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; color: var(--text); position: relative; }
+.hist-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 5px; flex: none; background: var(--muted); box-shadow: 0 0 0 3px var(--surface); position: relative; }
+.hist-dot.kind-vaccine { background: var(--blue); } .hist-dot.kind-deworm { background: var(--plum); }
+.hist-dot.kind-vitamins { background: var(--accent); } .hist-dot.kind-treatment { background: var(--danger); }
+.sex-quick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px; background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius-sm); }

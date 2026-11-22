@@ -8,7 +8,7 @@ import Pairing from './pages/Pairing';
 import Batches from './pages/Batches';
 import BatchForm from './pages/BatchForm';
 import BatchDetail from './pages/BatchDetail';
-import Health from './pages/Health';
+import Health, { HealthRecord } from './pages/Health';
 import Guides, { GuideDetail } from './pages/Guides';
 import Settings from './pages/Settings';
 import Costs from './pages/Costs';
@@ -87,6 +87,7 @@ function MainApp({ profile }: { profile: FarmProfile }) {
             <Route path="/hatch/:id/edit" element={<BatchForm />} />
             <Route path="/care" element={<Care />} />
             <Route path="/health" element={<Health />} />
+            <Route path="/health/record/:id" element={<HealthRecord />} />
             <Route path="/reminders" element={<Reminders />} />
             <Route path="/reminders/new" element={<ReminderForm />} />
             <Route path="/reminders/:id" element={<ReminderForm />} />

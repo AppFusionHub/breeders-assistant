@@ -7,6 +7,7 @@ import { BirdMultiPicker, Card, Field } from '../components';
 import { today } from '../lib/dates';
 import { googleCalendarUrl, repeatLabel } from '../lib/reminders';
 import { downloadICS } from '../schedule';
+import { KINDS } from '../lib/health';
 
 type Draft = Omit<Reminder, 'id' | 'createdAt' | 'active'>;
 
@@ -94,6 +95,12 @@ export default function ReminderForm() {
           </Field>
           <Field label="Group / pen (optional)">
             <input value={d.group ?? ''} onChange={(e) => up('group', e.target.value)} placeholder="e.g. Breeding pen 1, Stags" />
+          </Field>
+          <Field label="When ticked done, record in each bird's health log as" hint={d.birdIds.length ? undefined : 'Add birds above to record per bird.'}>
+            <select value={d.logAs ?? ''} onChange={(e) => up('logAs', (e.target.value || undefined) as Draft['logAs'])}>
+              <option value="">Don't record</option>
+              {KINDS.map((k) => <option key={k.id} value={k.id}>{k.label}</option>)}
+            </select>
           </Field>
           <Field label="Notes"><textarea rows={3} value={d.notes ?? ''} onChange={(e) => up('notes', e.target.value)} /></Field>
         </Card>
