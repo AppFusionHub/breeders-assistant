@@ -1,9 +1,10 @@
+import { ClipboardList } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Bird, type Reminder } from '../db';
 import { useBirds } from '../hooks';
-import { Card, Empty } from '../components';
+import { Card, Empty, Tile } from '../components';
 import { addDays, fmt, today } from '../lib/dates';
 import { repeatLabel } from '../lib/reminders';
 import { toggleDone, useOccurrences, useTodayList, type Occurrence } from '../schedule';
@@ -49,10 +50,7 @@ export default function Reminders() {
         <h1 className="grow">Reminders</h1>
         <Link to="/reminders/new" className="btn primary">+ Add</Link>
       </div>
-      <Link to="/programs" className="card guide-card">
-        <b>📋 Programs & routines</b>
-        <span className="small muted">Start a ready-made breeding-season program, or build your own routine.</span>
-      </Link>
+      <Tile to="/programs" icon={ClipboardList} tone="plum" title="Programs & routines" meta="Ready-made breeding-season programs or your own routines" />
 
       <Card>
         <h2>Today</h2>

@@ -1,3 +1,4 @@
+import { BellPlus } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, birdLabel, type Bird } from '../db';
@@ -139,7 +140,7 @@ export default function BirdDetail() {
       </Card>
 
       {bird.status === 'active' && (
-        <Link to={`/reminders/new?bird=${id}`} className="btn ghost">🔔 Add reminder for this bird</Link>
+        <Link to={`/reminders/new?bird=${id}`} className="btn ghost"><BellPlus size={18} /> Add reminder for this bird</Link>
       )}
       {bird.status === 'active' && (
         <Link to={`/costs/new?type=income&bird=${id}`} className="btn ghost">Record sale of this bird</Link>

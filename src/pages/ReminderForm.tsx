@@ -1,3 +1,4 @@
+import { AlarmClock } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { db, type Reminder } from '../db';
@@ -55,7 +56,7 @@ export default function ReminderForm() {
 
       {saved && (
         <Card className="cal-card">
-          <h2>⏰ Alarm on your phone</h2>
+          <h2 className="h-icon"><AlarmClock size={20} /> Alarm on your phone</h2>
           <p className="small muted">Add this to your phone's calendar so it rings even when the app is closed. {repeatLabel(saved)} at {saved.time}.</p>
           <div className="actions">
             <a className="btn primary" href={googleCalendarUrl(saved)} target="_blank" rel="noreferrer">Google Calendar</a>

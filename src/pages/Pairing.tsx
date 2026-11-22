@@ -1,6 +1,7 @@
+import { Sparkles } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useBirds, useKinship } from '../hooks';
-import { BirdPicker, Card, Field } from '../components';
+import { BirdPicker, Card, Field, Tile } from '../components';
 import { coiAdvice } from '../lib/pedigree';
 import { birdLabel } from '../db';
 import { confidence, pairNicks, verdict, verdictLabel } from '../lib/nick';
@@ -69,10 +70,7 @@ export default function Pairing() {
         </Card>
       )}
 
-      <Link to="/nicks" className="card guide-card">
-        <b>★ Nick finder</b>
-        <span className="small muted">See which pairs and bloodline crosses produce better offspring than expected.</span>
-      </Link>
+      <Tile to="/nicks" icon={Sparkles} tone="gold" title="Nick finder" meta="Pairs and bloodline crosses that produce better than expected" />
 
       <p className="small muted">COI uses the parents you've recorded. Unknown ancestors are treated as unrelated. See the guide <Link to="/guides/breeding-systems">Breeding systems & inbreeding</Link>.</p>
     </div>

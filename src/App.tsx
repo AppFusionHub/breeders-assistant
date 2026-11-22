@@ -1,4 +1,5 @@
-import { NavLink, Route, Routes, Link, useLocation } from 'react-router-dom';
+import { NavLink, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Bell, ChevronLeft } from 'lucide-react';
 import Home from './pages/Home';
 import Birds from './pages/Birds';
 import BirdForm from './pages/BirdForm';
@@ -17,75 +18,96 @@ import ErrorBoundary from './ErrorBoundary';
 import Reminders from './pages/Reminders';
 import ReminderForm from './pages/ReminderForm';
 import Programs, { ProgramDetail, ProgramEditor, RunDetail } from './pages/Programs';
-import { useInAppNotifications } from './notify';
 import Feeding from './pages/Feeding';
 import { FeedPlanDetail, FeedPlanEditor } from './pages/FeedPlans';
+import { Breeding, Care, More } from './pages/Hubs';
+import { useInAppNotifications } from './notify';
+import { useTodayList } from './schedule';
+import { TABS, isRoot, tabFor } from './nav';
+import { Logo } from './components';
 
-const NAV = [
-  { to: '/', label: 'Home', icon: '⌂' },
-  { to: '/birds', label: 'Birds', icon: '🐓' },
-  { to: '/hatch', label: 'Hatch', icon: '🥚' },
-  { to: '/health', label: 'Health', icon: '✚' },
-  { to: '/costs', label: 'Costs', icon: '₱' },
-];
+function TopBar() {
+  const { pathname } = useLocation();
+  const nav = useNavigate();
+  const today = useTodayList();
+  const open = today?.filter((o) => !o.done).length ?? 0;
+  const root = isRoot(pathname);
+  const tab = tabFor(pathname);
+  return (
+    <header className="topbar">
+      {root ? (
+        <Link to="/" className="brand"><Logo /><span>Breeder's Assistant</span></Link>
+      ) : (
+        <button className="back" onClick={() => (history.length > 1 ? nav(-1) : nav(tab.to))} aria-label="Back">
+          <ChevronLeft size={22} strokeWidth={2.25} /><span>{tab.label}</span>
+        </button>
+      )}
+      <Link to="/reminders" className="icon-btn" aria-label={open ? `Reminders, ${open} open today` : 'Reminders'}>
+        <Bell size={22} />
+        {open > 0 && <span className="dot-badge">{open > 9 ? '9+' : open}</span>}
+      </Link>
+    </header>
+  );
+}
 
 export default function App() {
   const { pathname } = useLocation();
   useInAppNotifications();
+  const active = tabFor(pathname);
   return (
     <div className="app">
-      <header className="topbar">
-        <Link to="/" className="brand">Breeder's Assistant</Link>
-        <div className="top-actions">
-          <Link to="/reminders" className="icon-btn" aria-label="Reminders">🔔</Link>
-          <Link to="/guides" className="icon-btn" aria-label="Guides">📖</Link>
-          <Link to="/settings" className="icon-btn" aria-label="Settings">⚙</Link>
-        </div>
-      </header>
+      <TopBar />
       <main className="content" key={pathname}>
         <ErrorBoundary>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/birds" element={<Birds />} />
-          <Route path="/birds/new" element={<BirdForm />} />
-          <Route path="/birds/:id" element={<BirdDetail />} />
-          <Route path="/birds/:id/edit" element={<BirdForm />} />
-          <Route path="/pair" element={<Pairing />} />
-          <Route path="/hatch" element={<Batches />} />
-          <Route path="/hatch/new" element={<BatchForm />} />
-          <Route path="/hatch/:id" element={<BatchDetail />} />
-          <Route path="/hatch/:id/edit" element={<BatchForm />} />
-          <Route path="/health" element={<Health />} />
-          <Route path="/guides" element={<Guides />} />
-          <Route path="/guides/:slug" element={<GuideDetail />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/costs" element={<Costs />} />
-          <Route path="/costs/new" element={<TxForm />} />
-          <Route path="/costs/:id" element={<TxForm />} />
-          <Route path="/nicks" element={<Nicks />} />
-          <Route path="/reminders" element={<Reminders />} />
-          <Route path="/reminders/new" element={<ReminderForm />} />
-          <Route path="/reminders/:id" element={<ReminderForm />} />
-          <Route path="/programs" element={<Programs />} />
-          <Route path="/programs/new" element={<ProgramEditor />} />
-          <Route path="/programs/:key" element={<ProgramDetail />} />
-          <Route path="/programs/:key/edit" element={<ProgramEditor />} />
-          <Route path="/runs/:id" element={<RunDetail />} />
-          <Route path="/feeding" element={<Feeding />} />
-          <Route path="/feedplans/new" element={<FeedPlanEditor />} />
-          <Route path="/feedplans/:id" element={<FeedPlanDetail />} />
-          <Route path="/feedplans/:id/edit" element={<FeedPlanEditor />} />
-          <Route path="*" element={<p className="muted">Page not found.</p>} />
-        </Routes>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/birds" element={<Birds />} />
+            <Route path="/birds/new" element={<BirdForm />} />
+            <Route path="/birds/:id" element={<BirdDetail />} />
+            <Route path="/birds/:id/edit" element={<BirdForm />} />
+            <Route path="/breeding" element={<Breeding />} />
+            <Route path="/pair" element={<Pairing />} />
+            <Route path="/nicks" element={<Nicks />} />
+            <Route path="/hatch" element={<Batches />} />
+            <Route path="/hatch/new" element={<BatchForm />} />
+            <Route path="/hatch/:id" element={<BatchDetail />} />
+            <Route path="/hatch/:id/edit" element={<BatchForm />} />
+            <Route path="/care" element={<Care />} />
+            <Route path="/health" element={<Health />} />
+            <Route path="/reminders" element={<Reminders />} />
+            <Route path="/reminders/new" element={<ReminderForm />} />
+            <Route path="/reminders/:id" element={<ReminderForm />} />
+            <Route path="/programs" element={<Programs />} />
+            <Route path="/programs/new" element={<ProgramEditor />} />
+            <Route path="/programs/:key" element={<ProgramDetail />} />
+            <Route path="/programs/:key/edit" element={<ProgramEditor />} />
+            <Route path="/runs/:id" element={<RunDetail />} />
+            <Route path="/feeding" element={<Feeding />} />
+            <Route path="/feedplans/new" element={<FeedPlanEditor />} />
+            <Route path="/feedplans/:id" element={<FeedPlanDetail />} />
+            <Route path="/feedplans/:id/edit" element={<FeedPlanEditor />} />
+            <Route path="/more" element={<More />} />
+            <Route path="/costs" element={<Costs />} />
+            <Route path="/costs/new" element={<TxForm />} />
+            <Route path="/costs/:id" element={<TxForm />} />
+            <Route path="/guides" element={<Guides />} />
+            <Route path="/guides/:slug" element={<GuideDetail />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<p className="muted">Page not found.</p>} />
+          </Routes>
         </ErrorBoundary>
       </main>
-      <nav className="tabbar">
-        {NAV.map((n) => (
-          <NavLink key={n.to} to={n.to} end={n.to === '/'} className={({ isActive }) => (isActive ? 'tab active' : 'tab')}>
-            <span className="tab-icon" aria-hidden>{n.icon}</span>
-            <span>{n.label}</span>
-          </NavLink>
-        ))}
+      <nav className="tabbar" aria-label="Main">
+        {TABS.map((t) => {
+          const Icon = t.icon;
+          const on = t === active;
+          return (
+            <NavLink key={t.to} to={t.to} className={on ? 'tab active' : 'tab'} aria-current={on ? 'page' : undefined}>
+              <span className="tab-pill"><Icon size={22} strokeWidth={on ? 2.25 : 1.9} /></span>
+              <span>{t.label}</span>
+            </NavLink>
+          );
+        })}
       </nav>
     </div>
   );

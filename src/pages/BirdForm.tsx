@@ -1,3 +1,4 @@
+import { Camera } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { db, type Bird, type BirdStatus, type Sex } from '../db';
@@ -59,7 +60,7 @@ export default function BirdForm() {
           {d.photo ? <img src={d.photo} alt="" className="photo-preview" /> : <div className="photo-preview placeholder">No photo</div>}
           <div className="stack-sm">
             <label className="btn">
-              📷 {d.photo ? 'Change photo' : 'Add photo'}
+              <Camera size={18} /> {d.photo ? 'Change photo' : 'Add photo'}
               <input type="file" accept="image/*" capture="environment" hidden onChange={(e) => onPhoto(e.target.files?.[0])} />
             </label>
             {d.photo && <button type="button" className="btn ghost" onClick={() => up('photo', undefined)}>Remove</button>}

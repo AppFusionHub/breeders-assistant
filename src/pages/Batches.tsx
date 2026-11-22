@@ -1,8 +1,9 @@
+import { Egg, EggOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, birdLabel } from '../db';
 import { useBirds } from '../hooks';
-import { Empty } from '../components';
+import { Empty, IconBadge } from '../components';
 import { fmt, today } from '../lib/dates';
 import { incubationDay, rate } from '../lib/incubation';
 
@@ -28,7 +29,7 @@ export default function Batches() {
         {batches?.map((b) => (
           <li key={b.id}>
             <Link to={`/hatch/${b.id}`} className="bird-row">
-              <div className="egg">{b.closed ? '🐣' : '🥚'}</div>
+              <IconBadge icon={b.closed ? EggOff : Egg} tone={b.closed ? 'gray' : 'green'} size={44} />
               <div className="grow">
                 <b>{b.label}</b>
                 <div className="muted small">{birdLabel(map.get(b.sireId ?? -1))} × {birdLabel(map.get(b.damId ?? -1))}</div>

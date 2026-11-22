@@ -35,6 +35,14 @@ export function ageLabel(hatch?: string, ref: string = today()): string {
   return `${(d / 365.25).toFixed(1)} yrs`;
 }
 
+/** Short date without the year when it's the current year. */
+export function fmtShort(iso?: string): string {
+  if (!iso) return '—';
+  const d = parseISO(iso);
+  const sameYear = d.getFullYear() === new Date().getFullYear();
+  return d.toLocaleDateString('en-PH', sameYear ? { month: 'short', day: 'numeric' } : { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 export function fmt(iso?: string): string {
   if (!iso) return '—';
   return parseISO(iso).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });

@@ -1,6 +1,7 @@
 import { Link, useSearchParams } from 'react-router-dom';
 import { useBirds } from '../hooks';
-import { Avatar, Empty, SexBadge } from '../components';
+import { Avatar, Empty, PageHeader, SexBadge } from '../components';
+import { Plus } from 'lucide-react';
 import { ageLabel } from '../lib/dates';
 import type { BirdStatus, Sex } from '../db';
 
@@ -24,10 +25,9 @@ export default function Birds() {
 
   return (
     <div className="stack">
-      <div className="toolbar">
-        <input type="search" placeholder="Search band, name, bloodline…" value={q} onChange={(e) => set('q', e.target.value)} />
-        <Link to="/birds/new" className="btn primary">+ Add</Link>
-      </div>
+      <PageHeader title="Flock" subtitle={birds ? `${birds.filter((b) => b.status === 'active').length} active birds` : undefined}
+        action={<Link to="/birds/new" className="btn primary"><Plus size={18} /> Add</Link>} />
+      <input type="search" placeholder="Search band, name, bloodline…" value={q} onChange={(e) => set('q', e.target.value)} />
       <div className="chips">
         {(['', 'M', 'F', 'U'] as const).map((s) => (
           <button key={s} className={`chip ${sex === s ? 'on' : ''}`} onClick={() => set('sex', s)}>

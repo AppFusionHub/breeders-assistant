@@ -1,3 +1,4 @@
+import { AlarmClock } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -232,7 +233,7 @@ function RunView({ run, rems, doneCount, map, onStop }: { run: ProgramRun; rems:
 
       {!run.stopped && (
         <Card className="cal-card">
-          <h2>⏰ Alarms on your phone</h2>
+          <h2 className="h-icon"><AlarmClock size={20} /> Alarms on your phone</h2>
           <p className="small muted">Add all {rems.length} reminders to your phone's calendar in one go, so they ring even when the app is closed.</p>
           <button className="btn primary" onClick={() => downloadICS(rems, `${run.name.replace(/[^\w]+/g, '-').toLowerCase()}.ics`)}>Add all to calendar (.ics)</button>
           <p className="hint">On Android, open the downloaded file with your Calendar app (Samsung Calendar works; Google Calendar on some phones only imports on the web). You can also add steps one by one to Google Calendar below.</p>

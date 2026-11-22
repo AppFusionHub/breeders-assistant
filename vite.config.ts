@@ -13,8 +13,8 @@ export default defineConfig({
         name: "Breeder's Assistant",
         short_name: 'Breeder',
         description: 'Offline gamefowl breeding records, pedigree, incubation and health tracker.',
-        theme_color: '#7a1f12',
-        background_color: '#faf6f0',
+        theme_color: '#9a2d17',
+        background_color: '#f6f1ea',
         display: 'standalone',
         start_url: './',
         icons: [
@@ -26,5 +26,6 @@ export default defineConfig({
       workbox: { globPatterns: ['**/*.{js,css,html,svg,png}'] },
     }),
   ],
+  build: { chunkSizeWarningLimit: 800 },
   test: { environment: 'node' },
 } as any);

@@ -1,3 +1,4 @@
+import { Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBirds } from '../hooks';
 import { Card, Empty } from '../components';
@@ -16,7 +17,7 @@ function NickRow({ r, title, to }: { r: NickResult; title: string; to?: string }
         </div>
       </div>
       <div className="right">
-        <span className={`nick-tag nick-${v}`}>{v === 'strong' && confidence(r) !== 'early' ? '★ ' : ''}{verdictLabel(r)}</span>
+        <span className={`nick-tag nick-${v}`}>{v === 'strong' && confidence(r) !== 'early' ? <Sparkles size={12} /> : null} {verdictLabel(r)}</span>
         <div className="small muted">{r.diff >= 0 ? '+' : ''}{r.diff.toFixed(2)} · {confidence(r)} data</div>
       </div>
     </>
@@ -41,7 +42,7 @@ export default function Nicks() {
 
       {ratedCount < 4 && (
         <Empty>
-          Rate your birds 1–5 on their profile (★ on the bird page) once you can judge them.
+          Rate your birds 1–5 on their profile (the stars on the bird page) once you can judge them.
           <span className="small">You have {ratedCount} rated bird{ratedCount === 1 ? '' : 's'}. Nicks appear once a pair has {MIN_PAIR}+ rated offspring.</span>
           <Link to="/birds" className="btn">Go to birds</Link>
         </Empty>

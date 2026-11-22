@@ -1,23 +1,35 @@
 import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { BellPlus, Bird, ChevronRight, Egg, Plus, Syringe, Wallet } from 'lucide-react';
 import { db } from '../db';
-import { Card } from '../components';
-import { useDueHealth } from '../hooks';
-import { fmt, today } from '../lib/dates';
+import { Card, IconBadge } from '../components';
+import { useBirds, useDueHealth } from '../hooks';
+import { fmtShort, today } from '../lib/dates';
 import { incubationDay, nextMilestone } from '../lib/incubation';
 import { peso, periodRange, summarize } from '../lib/money';
-import { useBirds } from '../hooks';
 import { useTodayList } from '../schedule';
 import { OccurrenceRow } from './Reminders';
+
+function greeting() {
+  const h = new Date().getHours();
+  return h < 12 ? 'Magandang umaga' : h < 18 ? 'Magandang hapon' : 'Magandang gabi';
+}
+
+function Ring({ done, total }: { done: number; total: number }) {
+  const r = 18, c = 2 * Math.PI * r, pct = total ? done / total : 0;
+  return (
+    <svg width="48" height="48" viewBox="0 0 48 48" className="ring" role="img" aria-label={`${done} of ${total} done`}>
+      <circle cx="24" cy="24" r={r} className="ring-track" />
+      <circle cx="24" cy="24" r={r} className="ring-fill" strokeDasharray={c} strokeDashoffset={c * (1 - pct)} transform="rotate(-90 24 24)" />
+      <text x="24" y="28" textAnchor="middle" className="ring-text">{done}/{total}</text>
+    </svg>
+  );
+}
 
 export default function Home() {
   const stats = useLiveQuery(async () => {
     const active = await db.birds.where('status').equals('active').toArray();
-    return {
-      cocks: active.filter((b) => b.sex === 'M').length,
-      hens: active.filter((b) => b.sex === 'F').length,
-      other: active.filter((b) => b.sex === 'U').length,
-    };
+    return { cocks: active.filter((b) => b.sex === 'M').length, hens: active.filter((b) => b.sex === 'F').length, other: active.filter((b) => b.sex === 'U').length };
   }, []);
   const open = useLiveQuery(() => db.batches.filter((b) => !b.closed).toArray(), []);
   const due = useDueHealth(7);
@@ -26,81 +38,91 @@ export default function Home() {
   const t = today();
   const [mFrom, mTo] = periodRange({ kind: 'month', year: Number(t.slice(0, 4)), month: Number(t.slice(5, 7)) });
   const month = useLiveQuery(async () => summarize(await db.transactions.where('date').between(mFrom, mTo, true, true).toArray()), [mFrom, mTo]);
+  const todays = todayList?.filter((o) => o.date === t) ?? [];
+  const doneToday = todays.filter((o) => o.done).length;
+  const dateStr = new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' });
 
   return (
     <div className="stack">
-      <div className="stat-row">
-        <Link to="/birds?sex=M" className="stat"><b>{stats?.cocks ?? '–'}</b><span>Cocks/Stags</span></Link>
-        <Link to="/birds?sex=F" className="stat"><b>{stats?.hens ?? '–'}</b><span>Hens/Pullets</span></Link>
-        <Link to="/birds?sex=U" className="stat"><b>{stats?.other ?? '–'}</b><span>Chicks</span></Link>
+      <div className="hello">
+        <p className="small muted">{dateStr}</p>
+        <h1>{greeting()}!</h1>
       </div>
 
-      <div className="actions">
-        <Link to="/birds/new" className="btn primary">+ Add bird</Link>
-        <Link to="/pair" className="btn">Plan a mating</Link>
-        <Link to="/hatch/new" className="btn">Set eggs</Link>
+      <div className="quick">
+        <Link to="/birds/new" className="quick-btn"><IconBadge icon={Bird} tone="red" size={44} /><span>Add bird</span></Link>
+        <Link to="/hatch/new" className="quick-btn"><IconBadge icon={Egg} tone="green" size={44} /><span>Set eggs</span></Link>
+        <Link to="/costs/new" className="quick-btn"><IconBadge icon={Wallet} tone="gold" size={44} /><span>Log cost</span></Link>
+        <Link to="/reminders/new" className="quick-btn"><IconBadge icon={BellPlus} tone="plum" size={44} /><span>Reminder</span></Link>
       </div>
 
-      <Card>
-        <div className="row-between">
-          <h2>Today's tasks</h2>
-          <Link to="/reminders" className="small">All →</Link>
+      <Card className="today">
+        <div className="card-head">
+          <div><h2>Today</h2><span className="small muted">{todays.length ? `${todays.length - doneToday} left` : 'No tasks scheduled'}</span></div>
+          {todays.length > 0 && <Ring done={doneToday} total={todays.length} />}
         </div>
         {todayList && !todayList.length && (
-          <p className="muted small">Nothing today. <Link to="/reminders/new">Add a reminder</Link> or <Link to="/programs">start a program</Link>.</p>
+          <p className="small muted">Nothing to do today. <Link to="/programs">Start a program</Link> or <Link to="/reminders/new">add a reminder</Link>.</p>
         )}
         {todayList?.map((o) => <OccurrenceRow key={`${o.reminder.id}-${o.date}`} o={o} map={map} />)}
       </Card>
 
-      <Card>
-        <h2>Incubating now</h2>
-        {!open?.length && <p className="muted">No active batches. <Link to="/hatch/new">Set eggs</Link></p>}
-        {open?.map((b) => {
-          const m = nextMilestone(b.setDate, t);
-          return (
-            <Link key={b.id} to={`/hatch/${b.id}`} className="row-link">
-              <div>
-                <b>{b.label}</b>
-                <div className="muted small">Day {incubationDay(b.setDate, t)} · {b.eggsSet} eggs</div>
-              </div>
-              <div className="right small">
-                {m ? <>{m.title}<br /><span className="muted">{m.date === t ? 'Today' : fmt(m.date)}</span></>
-                  : b.hatched != null ? <>Hatched {b.hatched}/{b.eggsSet}<br /><span className="muted">Tap to finish batch</span></>
-                  : <span className="danger">Past hatch day:<br />record results</span>}
-              </div>
-            </Link>
-          );
-        })}
-      </Card>
-
-      <Card>
-        <h2>Health due this week</h2>
-        {!due?.length && <p className="muted">Nothing due. Schedules come from each bird's hatch date.</p>}
-        {due?.slice(0, 8).map((d) => (
-          <Link key={`${d.bird.id}-${d.protocolId}`} to="/health" className="row-link">
-            <div><b>{d.bird.band}</b> <span className="small">{d.name}</span></div>
-            <div className={`right small ${d.overdue ? 'danger' : ''}`}>{d.overdue ? 'Overdue' : fmt(d.due)}</div>
-          </Link>
-        ))}
-        {(due?.length ?? 0) > 8 && <Link to="/health" className="small">See all {due!.length} →</Link>}
-      </Card>
-
-      <div className="grid2">
-        <Link to="/costs" className="card guide-card">
-          <span className="small muted">Spent this month</span>
-          <b className="money">{peso(month?.expense ?? 0, true)}</b>
-        </Link>
-        <Link to="/nicks" className="card guide-card">
-          <span className="small muted">Breeding</span>
-          <b>★ Nick finder</b>
-        </Link>
+      <div className="stat-row">
+        <Link to="/birds?sex=M" className="stat"><b>{stats?.cocks ?? '–'}</b><span>Cocks & stags</span></Link>
+        <Link to="/birds?sex=F" className="stat"><b>{stats?.hens ?? '–'}</b><span>Hens & pullets</span></Link>
+        <Link to="/birds?sex=U" className="stat"><b>{stats?.other ?? '–'}</b><span>Unsexed</span></Link>
       </div>
-      <Link to="/guides" className="card guide-card">
-        <b>📖 Guides</b>
-        <span className="small muted">Incubation, brooding, vaccination, biosecurity, breeding systems</span>
+
+      {!!open?.length && (
+        <Card>
+          <div className="card-head"><h2>Incubating</h2><Link to="/hatch" className="small">All</Link></div>
+          {open.map((b) => {
+            const m = nextMilestone(b.setDate, t);
+            const day = incubationDay(b.setDate, t);
+            return (
+              <Link key={b.id} to={`/hatch/${b.id}`} className="row-link">
+                <IconBadge icon={Egg} tone="green" size={36} />
+                <div className="grow">
+                  <b>{b.label}</b>
+                  <div className="mini-progress"><div style={{ width: `${Math.min(100, (day / 21) * 100)}%` }} /></div>
+                  <span className="small muted">Day {day} of 21 · {m ? `${m.title} ${m.date === t ? 'today' : fmtShort(m.date)}` : b.hatched != null ? `Hatched ${b.hatched}/${b.eggsSet}` : 'Record hatch results'}</span>
+                </div>
+                <ChevronRight size={18} className="muted" />
+              </Link>
+            );
+          })}
+        </Card>
+      )}
+
+      {!!due?.length && (
+        <Link to="/health" className="card alert-card">
+          <IconBadge icon={Syringe} tone="blue" size={40} />
+          <div className="grow">
+            <b>{due.length} vaccination{due.length > 1 ? 's' : ''} due this week</b>
+            <span className="small muted">{due.some((d) => d.overdue) ? 'Some are overdue · ' : ''}{[...new Set(due.map((d) => d.name))].slice(0, 2).join(', ')}</span>
+          </div>
+          <ChevronRight size={18} className="muted" />
+        </Link>
+      )}
+
+      <Link to="/costs" className="card alert-card">
+        <IconBadge icon={Wallet} tone="gold" size={40} />
+        <div className="grow"><b>{peso(month?.expense ?? 0, true)} spent this month</b><span className="small muted">Feed, vitamins and other costs</span></div>
+        <ChevronRight size={18} className="muted" />
       </Link>
 
-      <p className="muted small center">All data stays on this phone. Back it up often in Settings.</p>
+      {stats && stats.cocks + stats.hens + stats.other === 0 && (
+        <Card className="welcome">
+          <h2>Welcome! Start here</h2>
+          <ol className="tight small">
+            <li><Link to="/birds/new">Add your broodcocks and hens</Link>, with their parents if you know them.</li>
+            <li><Link to="/pair">Plan a mating</Link> and check the inbreeding level.</li>
+            <li><Link to="/hatch/new">Set eggs</Link> to track the 21 days and register chicks.</li>
+            <li><Link to="/settings">Back up</Link> your data from time to time.</li>
+          </ol>
+          <Link to="/birds/new" className="btn primary"><Plus size={18} /> Add first bird</Link>
+        </Card>
+      )}
     </div>
   );
 }
