@@ -4,7 +4,8 @@ import { db, birdLabel, type Bird } from '../db';
 import { useBirds, useKinship } from '../hooks';
 import { Avatar, Card, SexBadge, Stars } from '../components';
 import { peso } from '../lib/money';
-import { ageLabel, fmt } from '../lib/dates';
+import { stageForAge } from '../lib/feeding';
+import { ageLabel, daysBetween, fmt, today } from '../lib/dates';
 
 function PedNode({ bird, role }: { bird?: Bird; role: string }) {
   if (!bird) return <div className="ped-node unknown"><span className="muted small">{role}</span><span>Unknown</span></div>;
@@ -62,6 +63,10 @@ export default function BirdDetail() {
           <dt>Bloodline</dt><dd>{bird.bloodline ?? '—'}</dd>
           <dt>Color</dt><dd>{bird.color ?? '—'}</dd>
           <dt>Hatched</dt><dd>{fmt(bird.hatchDate)} {bird.hatchDate && <span className="muted">({ageLabel(bird.hatchDate)})</span>}</dd>
+          {bird.status === 'active' && (() => {
+            const st = stageForAge(bird.hatchDate ? daysBetween(bird.hatchDate, today()) / 7 : null, bird.sex);
+            return <><dt>Feeding</dt><dd><Link to={`/feeding?stage=${st.id}`}>{st.name}</Link> <span className="muted small">({st.protein[0]}–{st.protein[1]}% protein)</span></dd></>;
+          })()}
           <dt>Inbreeding (COI)</dt><dd>{(coi * 100).toFixed(1)}%</dd>
           {money?.map((m) => (
             <span key={m.id} style={{ display: 'contents' }}>

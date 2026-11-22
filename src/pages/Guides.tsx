@@ -11,6 +11,12 @@ export default function Guides() {
       {tags.map((t) => (
         <div key={t} className="stack-sm">
           <h2 className="eyebrow">{t}</h2>
+          {t === 'Husbandry' && (
+            <Link to="/feeding" className="card guide-card">
+              <b>Feeding by age + feed mix calculator</b>
+              <span className="small muted">Chick to adult, breeders and molt, using Philippine feeds. Check the protein of your own mix.</span>
+            </Link>
+          )}
           {GUIDES.filter((g) => g.tag === t).map((g) => (
             <Link key={g.slug} to={`/guides/${g.slug}`} className="card guide-card">
               <b>{g.title}</b>

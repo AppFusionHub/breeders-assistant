@@ -90,7 +90,7 @@ export const BUILTIN_PROGRAMS: BuiltinProgram[] = [
       { day: 7, lastDay: 28, everyDays: 7, time: '07:00', title: 'Lower brooder heat by about 3 °C', notes: 'Watch the chicks. Huddling means they are cold; panting or staying away from the heat means they are hot.' },
       { day: 14, lastDay: 56, everyDays: 7, time: '17:00', title: 'Litter & coccidiosis check', notes: 'Keep litter dry. Watch for bloody droppings or hunched, fluffed-up chicks, and call your vet if you see them.' },
       { day: 35, time: '07:00', title: 'Remove heat if fully feathered', notes: 'In warm weather most chicks no longer need heat by 4–6 weeks. Keep them out of drafts and rain.' },
-      { day: 49, time: '07:00', title: 'Switch from starter to grower feed', notes: 'Change over gradually across 3–5 days by mixing the old and new feed.' },
+      { day: 49, time: '07:00', title: 'Switch from starter to grower feed', notes: 'Change over gradually across 3–5 days by mixing the old and new feed. See Guides → Feeding by age for protein targets and the mix calculator.' },
       { day: 56, time: '08:00', title: 'Ask your vet about first deworming', notes: DEWORM_NOTE },
       { day: 56, time: '09:00', title: 'Move to grow-out pen (more space & perches)', notes: 'Give them room to exercise, low perches and shade.' },
       { day: 90, time: '07:00', title: 'Separate stags from pullets', notes: 'This reduces fighting and gives pullets a rest. Update each bird\'s sex in the app.' },

@@ -18,6 +18,7 @@ import Reminders from './pages/Reminders';
 import ReminderForm from './pages/ReminderForm';
 import Programs, { ProgramDetail, ProgramEditor, RunDetail } from './pages/Programs';
 import { useInAppNotifications } from './notify';
+import Feeding from './pages/Feeding';
 
 const NAV = [
   { to: '/', label: 'Home', icon: '⌂' },
@@ -69,6 +70,7 @@ export default function App() {
           <Route path="/programs/:key" element={<ProgramDetail />} />
           <Route path="/programs/:key/edit" element={<ProgramEditor />} />
           <Route path="/runs/:id" element={<RunDetail />} />
+          <Route path="/feeding" element={<Feeding />} />
           <Route path="*" element={<p className="muted">Page not found.</p>} />
         </Routes>
         </ErrorBoundary>

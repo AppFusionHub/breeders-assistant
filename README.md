@@ -13,6 +13,7 @@ An offline-first Progressive Web App (PWA) for gamefowl breeders: bird records, 
 - **Ratings & nick finder**: rate birds 1–5. The app flags pairs and bloodline crosses whose offspring beat what each parent produces with other mates. Labels are softened when there's little data.
 - **Reminders**: one-time or repeating reminders for a bird, several birds or a pen, plus a "Today" checklist on Home. For real alarms, export to the phone calendar (.ics with alarms, or a Google Calendar link). In-app notifications show while the app is open.
 - **Programs & routines**: built-in breeding-season programs (pre-breeding conditioning, molt care, hen recovery, chick-to-stag grow-out) with sources, plus a builder for your own multi-day routines. Starting one creates all its reminders.
+- **Feeding by age**: stages from chick to adult (plus breeders and molt) with protein and calcium targets, using Philippine feeds. Includes a feed mix calculator that checks your own mix's protein against the target, and each bird's page shows its current feeding stage.
 - **Guides** (offline): incubation, brooding, vaccination, biosecurity, disease signs, breeding systems and record keeping, with sources.
 - **Backup**: JSON export/import (uses the share sheet on mobile). All data stays on the device in IndexedDB.
 
