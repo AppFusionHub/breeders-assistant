@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg'],
+      includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: "Breeder's Assistant",
         short_name: 'Breeder',
@@ -20,7 +20,7 @@ export default defineConfig({
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: { globPatterns: ['**/*.{js,css,html,svg,png}'] },

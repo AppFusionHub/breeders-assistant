@@ -6,7 +6,7 @@ import { birdLabel } from './db';
 
 export function Logo({ size = 28 }: { size?: number }) {
   return (
-    <span className="logo" style={{ width: size, height: size }} aria-hidden><BirdIcon size={size * 0.62} strokeWidth={2.25} /></span>
+    <img className="logo" src="./icon.svg" width={size} height={size} alt="" aria-hidden />
   );
 }
 

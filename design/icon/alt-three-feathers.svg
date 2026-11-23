@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#9a2d17"/>
+  <g transform="translate(256 400)">
+    <!-- Duck feather (left) -->
+    <g transform="rotate(-34)">
+      <path d="M0 0 C-46 -60 -50 -170 0 -250 C50 -170 46 -60 0 0 Z" fill="#3e9a66"/>
+      <path d="M0 0 L0 -250" stroke="#f6f1ea" stroke-width="6" stroke-linecap="round"/>
+      <path d="M-30 -120 L0 -96 M-26 -170 L0 -146 M30 -120 L0 -96 M26 -170 L0 -146" stroke="#2f7d4f" stroke-width="6" stroke-linecap="round"/>
+    </g>
+    <!-- Pigeon feather (right) -->
+    <g transform="rotate(34)">
+      <path d="M0 0 C-44 -60 -48 -165 0 -245 C48 -165 44 -60 0 0 Z" fill="#8a9bb3"/>
+      <path d="M0 0 L0 -245" stroke="#f6f1ea" stroke-width="6" stroke-linecap="round"/>
+      <path d="M-30 -120 L0 -96 M-26 -170 L0 -146 M30 -120 L0 -96 M26 -170 L0 -146" stroke="#6f8099" stroke-width="6" stroke-linecap="round"/>
+    </g>
+    <!-- Rooster sickle feather (centre) -->
+    <path d="M0 0 C-52 -80 -40 -220 40 -300 C30 -210 52 -90 0 0 Z" fill="#e8a33d"/>
+    <path d="M0 0 C-16 -110 0 -220 40 -300" stroke="#f6f1ea" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <circle cx="0" cy="0" r="26" fill="#f6f1ea"/>
+    <circle cx="0" cy="0" r="12" fill="#9a2d17"/>
+  </g>
+</svg>
