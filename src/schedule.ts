@@ -8,7 +8,7 @@ export function stepToReminder(step: ProgramStep, start: string) {
   const date = addDays(start, step.day);
   const repeating = step.lastDay != null && step.lastDay > step.day;
   return {
-    title: step.title, notes: step.notes, date, time: step.time, logAs: step.logAs,
+    title: step.title, notes: step.notes, date, time: step.time, logAs: step.logAs, tag: step.type,
     repeat: repeating ? { kind: 'every' as const, days: Math.max(1, step.everyDays ?? 1) } : { kind: 'once' as const },
     endDate: repeating ? addDays(start, step.lastDay!) : undefined,
   };

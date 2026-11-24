@@ -314,3 +314,41 @@ ul.tight, ol.tight { margin: 0; padding-left: 20px; } ul.tight li + li, ol.tight
 .hist-dot.kind-vaccine { background: var(--blue); } .hist-dot.kind-deworm { background: var(--plum); }
 .hist-dot.kind-vitamins { background: var(--accent); } .hist-dot.kind-treatment { background: var(--danger); }
 .sex-quick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px; background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius-sm); }
+
+/* ===== Routine board / editor ===== */
+.type-tag { display: inline-block; margin-left: 6px; font-size: .68rem; font-weight: 700; padding: 1px 7px; border-radius: 6px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); vertical-align: 2px; text-transform: uppercase; letter-spacing: .03em; }
+.board { display: flex; flex-direction: column; gap: 8px; }
+.phase-band { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: var(--radius-sm); margin-top: 6px; text-transform: uppercase; letter-spacing: .05em; font-size: .85rem; }
+.phase-band span { font-size: .75rem; font-weight: 600; opacity: .85; text-transform: none; letter-spacing: 0; }
+.day-card { background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; box-shadow: var(--shadow); }
+.day-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.day-step { display: flex; gap: 10px; padding: 6px 0; border-top: 1px dashed var(--line); }
+.day-head + .day-step { border-top: 0; }
+.day-time { flex: none; width: 58px; font-size: .78rem; font-weight: 700; color: var(--muted); padding-top: 2px; font-variant-numeric: tabular-nums; }
+.edge-red { border-left-color: var(--primary) !important; } .edge-gold { border-left-color: var(--accent) !important; }
+.edge-green { border-left-color: var(--ok) !important; } .edge-blue { border-left-color: var(--blue) !important; }
+.edge-plum { border-left-color: var(--plum) !important; } .edge-gray { border-left-color: var(--muted) !important; }
+.phase-strip { display: flex; gap: 3px; height: 6px; margin-top: 8px; width: 100%; }
+.phase-strip span { border-radius: 3px; }
+.phase-edit { border-left: 5px solid var(--line); padding: 8px 0 8px 10px; margin-bottom: 10px; }
+.phase-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.phase-row label { display: flex; align-items: center; gap: 6px; }
+.phase-row input { width: 64px; min-height: 38px; padding: 6px 8px; }
+.swatches { display: flex; gap: 6px; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+.swatch.on { border-color: var(--text); }
+.icon-btn.small-icon { width: 40px; height: 40px; color: var(--danger); background: none; border: 0; cursor: pointer; }
+.phase-chip { margin-left: 8px; font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; vertical-align: 3px; }
+.day-edit { border-left: 5px solid var(--line); }
+.step-edit { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid var(--line); }
+.card-head + .step-edit { border-top: 0; padding-top: 4px; }
+.step-grid { display: grid; grid-template-columns: minmax(150px, 42%) 1fr; gap: 8px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px; }
+.grid3 .field-label { font-size: .74rem; }
+.more summary, .paste-card summary { cursor: pointer; color: var(--primary); list-style: none; }
+.more summary::-webkit-details-marker, .paste-card summary::-webkit-details-marker { display: none; }
+.paste-card summary { color: var(--text); display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.paste-card[open] summary { margin-bottom: 8px; }
+.paste-card textarea { margin: 8px 0; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 14px; }
+.paste-card code, .hint code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; font-size: .8em; }
+.step-actions { display: flex; gap: 16px; justify-content: flex-end; }

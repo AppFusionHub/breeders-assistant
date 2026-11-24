@@ -26,7 +26,7 @@ export function OccurrenceRow({ o, map, showDate }: { o: Occurrence; map: Map<nu
       <input type="checkbox" checked={done} aria-label={`Done: ${o.reminder.title}`}
         onChange={(e) => { setDone(e.target.checked); toggleDone(o.reminder.id, o.date, e.target.checked); }} />
       <Link to={`/reminders/${o.reminder.id}`} className="grow occ-body">
-        <b>{o.reminder.title}</b>
+        <b>{o.reminder.title}{o.reminder.tag && <span className="type-tag">{o.reminder.tag}</span>}</b>
         <span className="small muted">
           {showDate || late ? `${fmt(o.date)} · ` : ''}{o.reminder.time}{who && ` · ${who}`}
           {late && <span className="danger"> · missed</span>}

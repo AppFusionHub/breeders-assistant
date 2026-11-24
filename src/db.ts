@@ -114,6 +114,7 @@ export interface Reminder {
   runId?: number;
   /** When ticked done, record this in each attached bird's health log. */
   logAs?: HealthKind;
+  tag?: string;
   active: boolean;
   createdAt: number;
 }
@@ -133,12 +134,23 @@ export interface ProgramStep {
   title: string;
   notes?: string;
   logAs?: HealthKind;
+  /** User-defined label, e.g. "Training", "Medicine". */
+  type?: string;
+}
+
+export interface ProgramPhase {
+  name: string;
+  fromDay: number; // 1-based, inclusive
+  toDay: number;
+  color: string; // tone id
 }
 
 export interface Program {
   id: number;
   name: string;
+  category?: string;
   description?: string;
+  phases?: ProgramPhase[];
   steps: ProgramStep[];
   createdAt: number;
 }
