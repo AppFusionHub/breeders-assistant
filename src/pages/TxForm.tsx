@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, EXPENSE_CATEGORIES, INCOME_CATEGORIES, type Transaction, type TxType } from '../db';
+import { db, EXPENSE_CATEGORIES, INCOME_CATEGORIES, SUPPLIER_TYPES, type Supplier, type Transaction, type TxType } from '../db';
 import { useBirds } from '../hooks';
 import { BirdPicker, Card, Field } from '../components';
 import { fmt, today } from '../lib/dates';
@@ -19,7 +19,10 @@ export default function TxForm() {
   const [d, setD] = useState<Draft>({
     type: (sp.get('type') as TxType) ?? 'expense', date: today(), category: 'Feed', amount: '', qty: '', unit: 'kg',
     birdId: sp.get('bird') ? Number(sp.get('bird')) : undefined,
+    supplierId: sp.get('supplier') ? Number(sp.get('supplier')) : undefined,
   });
+  const suppliers = useLiveQuery(() => db.suppliers.orderBy('name').toArray(), []);
+  const [newSup, setNewSup] = useState<string | null>(null);
   const [err, setErr] = useState('');
   // Recent entries to repeat with one tap (e.g. the usual feed sack).
   const recent = useLiveQuery(async () => {
@@ -55,6 +58,7 @@ export default function TxForm() {
     const rec = {
       type: d.type, date: d.date, category: d.category, amount, description: d.description?.trim() || undefined,
       qty: showQty && qty ? qty : undefined, unit: showQty && qty ? d.unit : undefined, birdId: showBird ? d.birdId : undefined,
+      supplierId: d.type === 'expense' ? d.supplierId : undefined,
     };
     if (id) await db.transactions.update(Number(id), rec);
     else await db.transactions.add({ ...rec, createdAt: Date.now() } as Transaction);
@@ -124,6 +128,31 @@ export default function TxForm() {
           <input value={d.description ?? ''} onChange={(e) => up('description', e.target.value)}
             placeholder={d.type === 'income' ? 'Buyer, notes' : 'Brand / store, e.g. Grower pellets, 50kg'} />
         </Field>
+        {d.type === 'expense' && (
+          <Field label="Supplier (where you bought it)">
+            {newSup == null ? (
+              <select value={d.supplierId ?? ''} onChange={(e) => {
+                if (e.target.value === 'new') { setNewSup(''); return; }
+                up('supplierId', e.target.value ? Number(e.target.value) : undefined);
+              }}>
+                <option value="">Not set</option>
+                {suppliers?.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                <option value="new">+ New supplier…</option>
+              </select>
+            ) : (
+              <div className="toolbar">
+                <input value={newSup} onChange={(e) => setNewSup(e.target.value)} placeholder="Supplier name" autoFocus aria-label="New supplier name" />
+                <button type="button" className="btn small" onClick={async () => {
+                  const name = newSup.trim();
+                  if (!name) { setNewSup(null); return; }
+                  const existing = suppliers?.find((s) => s.name.toLowerCase() === name.toLowerCase());
+                  const sid = existing?.id ?? (await db.suppliers.add({ name, type: d.category === 'Vaccines & medicine' ? SUPPLIER_TYPES[1] : SUPPLIER_TYPES[0], createdAt: Date.now() } as Supplier));
+                  up('supplierId', sid as number); setNewSup(null);
+                }}>Add</button>
+              </div>
+            )}
+          </Field>
+        )}
         {showBird && (
           <Field label="Bird (optional)">
             <BirdPicker birds={birds ?? []} value={d.birdId} onChange={(v) => up('birdId', v)} placeholder="None" />

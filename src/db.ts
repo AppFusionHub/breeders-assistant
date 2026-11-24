@@ -84,6 +84,20 @@ export interface Transaction {
   qty?: number;
   unit?: string; // kg, sack, bottle, pc
   birdId?: number;
+  supplierId?: number;
+  createdAt: number;
+}
+
+export const SUPPLIER_TYPES = ['Agrivet / feed store', 'Vet clinic / pharmacy', 'Online shop', 'Breeder / farm', 'Other'] as const;
+
+export interface Supplier {
+  id: number;
+  name: string;
+  type: string;
+  contactPerson?: string;
+  phone?: string;
+  location?: string;
+  notes?: string;
   createdAt: number;
 }
 
@@ -176,6 +190,7 @@ export const db = new Dexie('breeders-assistant') as Dexie & {
   runs: EntityTable<ProgramRun, 'id'>;
   feedPlans: EntityTable<FeedPlan, 'id'>;
   meta: EntityTable<MetaRow, 'key'>;
+  suppliers: EntityTable<Supplier, 'id'>;
 };
 
 db.version(1).stores({
@@ -217,6 +232,11 @@ db.version(5).stores({
 
 db.version(6).stores({
   health: '++id, birdId, date, protocolId, reminderId',
+});
+
+db.version(7).stores({
+  suppliers: '++id, name',
+  transactions: '++id, date, type, category, birdId, createdAt, supplierId',
 });
 
 db.on('populate', (tx) => {

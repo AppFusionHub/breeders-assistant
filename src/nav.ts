@@ -7,7 +7,7 @@ export const TABS: Tab[] = [
   { to: '/birds', label: 'Flock', icon: Bird, match: /^\/birds/ },
   { to: '/breeding', label: 'Breeding', icon: Network, match: /^\/(breeding|pair|nicks|hatch)/ },
   { to: '/care', label: 'Care', icon: HeartPulse, match: /^\/(care|health|reminders|programs|runs|feeding|feedplans)/ },
-  { to: '/more', label: 'More', icon: LayoutGrid, match: /^\/(more|costs|guides|settings|profile)/ },
+  { to: '/more', label: 'More', icon: LayoutGrid, match: /^\/(more|costs|suppliers|guides|settings|profile)/ },
 ];
 
 export const tabFor = (path: string) => TABS.find((t) => t.match.test(path)) ?? TABS[0];

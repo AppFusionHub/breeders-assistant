@@ -14,6 +14,7 @@ export default function Costs() {
   const txs = useLiveQuery(() => db.transactions.where('date').between(from, to, true, true).reverse().sortBy('date'), [from, to]);
   const activeCount = useLiveQuery(() => db.birds.where('status').equals('active').count(), []);
   const { map } = useBirds();
+  const supMap = useLiveQuery(async () => new Map((await db.suppliers.toArray()).map((s) => [s.id, s.name])), []);
   const s = summarize(txs ?? []);
   const maxCat = s.categories[0]?.amount ?? 0;
   const months = period.kind === 'year' ? 12 : 1;
@@ -22,6 +23,7 @@ export default function Costs() {
     <div className="stack">
       <div className="toolbar">
         <h1 className="grow">Costs</h1>
+        <Link to="/suppliers" className="btn">Suppliers</Link>
         <Link to="/costs/new" className="btn primary">+ Add</Link>
       </div>
 
@@ -73,7 +75,7 @@ export default function Costs() {
               <div className="grow">
                 <b>{x.category}</b>{x.qty ? <span className="small"> · {x.qty} {x.unit}</span> : null}
                 <div className="small muted">
-                  {fmt(x.date)}{x.description && ` · ${x.description}`}{x.birdId != null && ` · ${birdLabel(map.get(x.birdId))}`}
+                  {fmt(x.date)}{x.description && ` · ${x.description}`}{x.supplierId != null && supMap?.get(x.supplierId) && ` · ${supMap.get(x.supplierId)}`}{x.birdId != null && ` · ${birdLabel(map.get(x.birdId))}`}
                 </div>
               </div>
               <b className={x.type === 'income' ? 'pos' : ''}>{x.type === 'income' ? '+' : '−'}{peso(x.amount)}</b>

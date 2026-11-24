@@ -21,6 +21,7 @@ import Programs, { ProgramDetail, ProgramEditor, RunDetail } from './pages/Progr
 import Feeding from './pages/Feeding';
 import { FeedPlanDetail, FeedPlanEditor } from './pages/FeedPlans';
 import { Breeding, Care, More } from './pages/Hubs';
+import Suppliers, { SupplierDetail, SupplierForm } from './pages/Suppliers';
 import { useInAppNotifications } from './notify';
 import { useTodayList } from './schedule';
 import { TABS, isRoot, tabFor } from './nav';
@@ -104,6 +105,10 @@ function MainApp({ profile }: { profile: FarmProfile }) {
             <Route path="/costs" element={<Costs />} />
             <Route path="/costs/new" element={<TxForm />} />
             <Route path="/costs/:id" element={<TxForm />} />
+            <Route path="/suppliers" element={<Suppliers />} />
+            <Route path="/suppliers/new" element={<SupplierForm />} />
+            <Route path="/suppliers/:id" element={<SupplierDetail />} />
+            <Route path="/suppliers/:id/edit" element={<SupplierForm />} />
             <Route path="/guides" element={<Guides />} />
             <Route path="/guides/:slug" element={<GuideDetail />} />
             <Route path="/settings" element={<Settings />} />
